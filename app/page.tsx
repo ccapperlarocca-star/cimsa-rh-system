@@ -335,7 +335,7 @@ export default function Home() {
     nuevoEstatus: string
   ) => {
     console.log("▶ actualizarEstatusVacante llamada");
-    console.log("  id:", id);
+    console.log("  id:", id, "| tipo:", typeof id);
     console.log("  nuevoEstatus:", nuevoEstatus);
 
     if (!id) {
@@ -343,6 +343,7 @@ export default function Home() {
       return;
     }
 
+    // Intentar update por id
     const { data, error } = await supabase
       .from("vacantes")
       .update({ estatus: nuevoEstatus })
@@ -352,7 +353,15 @@ export default function Home() {
     console.log("  data devuelta:", data);
     console.log("  error:", error);
 
-    if (error) { console.log(error); return; }
+    if (error) { console.log("Error Supabase:", error); return; }
+
+    // Si no actualizó ninguna fila, RLS está bloqueando
+    if (!data || data.length === 0) {
+      console.warn("⚠️ Update no afectó filas. Verifica políticas RLS en Supabase para la tabla 'vacantes'. Necesitas una política UPDATE que permita el acceso.");
+      alert("No se pudo actualizar. Revisa las políticas RLS de Supabase en la tabla 'vacantes' → agrega política UPDATE.");
+      return;
+    }
+
     obtenerVacantes();
   };
 
@@ -464,6 +473,14 @@ export default function Home() {
   useEffect(() => {
     obtenerCandidatos();
     obtenerVacantes();
+
+    // Refrescar cada 30 segundos para mantener ids sincronizados
+    const interval = setInterval(() => {
+      obtenerCandidatos();
+      obtenerVacantes();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
