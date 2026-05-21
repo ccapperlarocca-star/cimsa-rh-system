@@ -334,31 +334,16 @@ export default function Home() {
     id: string,
     nuevoEstatus: string
   ) => {
-    console.log("▶ actualizarEstatusVacante llamada");
-    console.log("  id:", id, "| tipo:", typeof id);
-    console.log("  nuevoEstatus:", nuevoEstatus);
+    if (!id) return;
 
-    if (!id) {
-      console.error("❌ id es undefined o vacío, abortando");
-      return;
-    }
-
-    // Intentar update por id
     const { data, error } = await supabase
       .from("vacantes")
       .update({ estatus: nuevoEstatus })
       .eq("id", id)
       .select();
 
-    console.log("  data devuelta:", data);
-    console.log("  error:", error);
-
-    if (error) { console.log("Error Supabase:", error); return; }
-
-    // Si no actualizó ninguna fila, RLS está bloqueando
-    if (!data || data.length === 0) {
-      console.warn("⚠️ Update no afectó filas. Verifica políticas RLS en Supabase para la tabla 'vacantes'. Necesitas una política UPDATE que permita el acceso.");
-      alert("No se pudo actualizar. Revisa las políticas RLS de Supabase en la tabla 'vacantes' → agrega política UPDATE.");
+    if (error || !data || data.length === 0) {
+      console.log("Error actualizando estatus:", error);
       return;
     }
 
@@ -602,7 +587,6 @@ export default function Home() {
                   <th className="p-4 text-left">Solicitados</th>
                   <th className="p-4 text-left">Cubiertos</th>
                   <th className="p-4 text-left">Pendientes</th>
-                  <th className="p-4 text-left">Estatus</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -615,25 +599,6 @@ export default function Home() {
                     <td className="p-4">{v.cubiertos}</td>
                     <td className="p-4">
                       {v.solicitados - v.cubiertos}
-                    </td>
-                    <td className="p-4">
-                      <select
-                        value={v.estatus}
-                        onChange={(e) =>
-                          actualizarEstatusVacante(
-                            v.id,
-                            e.target.value
-                          )
-                        }
-                        className={`px-3 py-2 rounded-lg text-white font-semibold border-0 cursor-pointer ${
-                          v.estatus === "Cubierta"
-                            ? "bg-green-600"
-                            : "bg-yellow-500"
-                        }`}
-                      >
-                        <option value="Abierta"  className="bg-white text-black">Abierta</option>
-                        <option value="Cubierta" className="bg-white text-black">Cubierta</option>
-                      </select>
                     </td>
                     <td className="p-4">
                       <button
