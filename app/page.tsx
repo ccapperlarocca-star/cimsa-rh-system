@@ -289,6 +289,31 @@ export default function Home() {
     vacanteId: string,
     vacanteNombre: string
   ) => {
+    // VALIDAR SI YA HAY UN CONTRATADO
+
+if (contratado) {
+
+  const yaContratados =
+    candidatos.filter(
+
+      (c) =>
+
+        c.vacante_id === vacanteId &&
+
+        c.contratado === true
+    );
+
+  // SI YA EXISTE UNO
+
+  if (yaContratados.length >= 1) {
+
+    alert(
+      "La vacante ya está cubierta. Reasigna el candidato a otra vacante."
+    );
+
+    return;
+  }
+}
 
     // 1. Actualizar candidato
     const { error } = await supabase
@@ -613,6 +638,9 @@ export default function Home() {
                   <th className="p-4 text-left">Cubiertos</th>
                   <th className="p-4 text-left">Pendientes</th>
                   <th className="p-4 text-left">Estatus</th>
+                  <th className="p-4 text-left">
+  Reasignar
+</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -636,6 +664,77 @@ export default function Home() {
                         {v.estatus}
                       </span>
                     </td>
+                    <td className="p-4">
+
+  <select
+
+    value={candidato.vacante_id || ""}
+
+    onChange={async (e) => {
+
+      const nuevaVacanteId =
+        e.target.value;
+
+      const vacanteNueva =
+        vacantes.find(
+
+          (v) =>
+            v.id === nuevaVacanteId
+        );
+
+      if (!vacanteNueva) return;
+
+      await supabase
+        .from("candidatos")
+        .update({
+
+          vacante_id:
+            nuevaVacanteId,
+
+          vacante:
+            vacanteNueva.nombre,
+
+          cliente:
+            vacanteNueva.cliente
+        })
+        .eq(
+          "id",
+          candidato.id
+        );
+
+      obtenerCandidatos();
+
+      obtenerVacantes();
+    }}
+
+    className="border rounded-lg p-2"
+  >
+
+    <option value="">
+      Reasignar
+    </option>
+
+    {vacantes
+
+      .filter(
+        (v) =>
+          v.estatus === "Abierta"
+      )
+
+      .map((v) => (
+
+        <option
+          key={v.id}
+          value={v.id}
+        >
+
+          {v.nombre} — {v.cliente}
+
+        </option>
+      ))}
+  </select>
+
+</td>
                     <td className="p-4">
                       <button
                         onClick={() => eliminarVacante(v.id)}
