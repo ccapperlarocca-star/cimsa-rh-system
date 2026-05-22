@@ -638,9 +638,6 @@ if (contratado) {
                   <th className="p-4 text-left">Cubiertos</th>
                   <th className="p-4 text-left">Pendientes</th>
                   <th className="p-4 text-left">Estatus</th>
-                  <th className="p-4 text-left">
-  Reasignar
-</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -664,87 +661,18 @@ if (contratado) {
                         {v.estatus}
                       </span>
                     </td>
-                    <td className="p-4">
-
-  <select
-
-    value={candidato.vacante_id || ""}
-
-    onChange={async (e) => {
-
-      const nuevaVacanteId =
-        e.target.value;
-
-      const vacanteNueva =
-        vacantes.find(
-
-          (v) =>
-            v.id === nuevaVacanteId
-        );
-
-      if (!vacanteNueva) return;
-
-      await supabase
-        .from("candidatos")
-        .update({
-
-          vacante_id:
-            nuevaVacanteId,
-
-          vacante:
-            vacanteNueva.nombre,
-
-          cliente:
-            vacanteNueva.cliente
-        })
-        .eq(
-          "id",
-          candidato.id
-        );
-
-      obtenerCandidatos();
-
-      obtenerVacantes();
-    }}
-
-    className="border rounded-lg p-2"
+                    
+<td className="p-4">
+  <button
+    onClick={() => eliminarVacante(v.id)}
+    className="bg-red-600 text-white px-4 py-2 rounded-lg"
   >
-
-    <option value="">
-      Reasignar
-    </option>
-
-    {vacantes
-
-      .filter(
-        (v) =>
-          v.estatus === "Abierta"
-      )
-
-      .map((v) => (
-
-        <option
-          key={v.id}
-          value={v.id}
-        >
-
-          {v.nombre} — {v.cliente}
-
-        </option>
-      ))}
-  </select>
-
+    Eliminar
+  </button>
 </td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => eliminarVacante(v.id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+
+</tr>
+))}
               </tbody>
             </table>
           </div>
