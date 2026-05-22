@@ -859,8 +859,13 @@ if (contratado) {
   Estatus
 </th>
                   <th className="p-4 text-left">Contratado</th>
-                  <th className="p-4 text-left">Fecha</th>
-                  <th className="p-4 text-left">Acciones</th>
+                  <th className="p-4 text-left">
+  Reasignar
+</th>
+
+<th className="p-4 text-left">Fecha</th>
+
+<th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -963,6 +968,77 @@ if (contratado) {
                         {candidato.contratado ? "Sí" : "No"}
                       </button>
                     </td>
+                    <td className="p-4">
+
+  <select
+
+    value={candidato.vacante_id || ""}
+
+    onChange={async (e) => {
+
+      const nuevaVacanteId =
+        e.target.value;
+
+      const vacanteNueva =
+        vacantes.find(
+
+          (v) =>
+            v.id == nuevaVacanteId
+        );
+
+      if (!vacanteNueva) return;
+
+      await supabase
+        .from("candidatos")
+        .update({
+
+          vacante_id:
+            nuevaVacanteId,
+
+          vacante:
+            vacanteNueva.nombre,
+
+          cliente:
+            vacanteNueva.cliente
+        })
+        .eq(
+          "id",
+          candidato.id
+        );
+
+      obtenerCandidatos();
+
+      obtenerVacantes();
+    }}
+
+    className="border rounded-lg p-2"
+  >
+
+    <option value="">
+      Reasignar
+    </option>
+
+    {vacantes
+
+      .filter(
+        (v) =>
+          v.estatus === "Abierta"
+      )
+
+      .map((v) => (
+
+        <option
+          key={v.id}
+          value={v.id}
+        >
+
+          {v.nombre} — {v.cliente}
+
+        </option>
+      ))}
+  </select>
+
+</td>
                     <td className="p-4">
                       {new Date(candidato.created_at).toLocaleDateString(
                         "es-MX"
