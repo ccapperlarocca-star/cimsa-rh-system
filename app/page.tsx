@@ -82,8 +82,10 @@ export default function Home() {
     setMedioCaptacion,
   ] = useState("");
 
-  const [candidatos, setCandidatos] =
-    useState<any[]>([]);
+  const [
+    vacanteIdSeleccionada,
+    setVacanteIdSeleccionada,
+  ] = useState("");
 
   // =====================================================
   // STATES VACANTES
@@ -114,7 +116,11 @@ export default function Home() {
   const [
     fechaSeleccionada,
     setFechaSeleccionada,
-  ] = useState<Date>(new Date());
+  ] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setFechaSeleccionada(new Date());
+  }, []);
 
   // =====================================================
   // SEMANAS
@@ -162,6 +168,7 @@ export default function Home() {
       !nombre ||
       !telefono ||
       !vacante ||
+      !vacanteIdSeleccionada ||
       !cliente ||
       !localidad ||
       !medioCaptacion
@@ -177,6 +184,7 @@ export default function Home() {
           nombre,
           telefono,
           vacante,
+          vacante_id: vacanteIdSeleccionada,
           cliente,
           localidad,
           medio_captacion: medioCaptacion,
@@ -194,6 +202,7 @@ export default function Home() {
     setNombre("");
     setTelefono("");
     setVacante("");
+    setVacanteIdSeleccionada("");
     setCliente("");
     setLocalidad("");
     setMedioCaptacion("");
@@ -273,10 +282,11 @@ export default function Home() {
   const actualizarContratado = async (
     id: string,
     contratado: boolean,
+    vacanteId: string,
     vacanteNombre: string
   ) => {
 
-    // 1. Actualizar candidato y esperar confirmación
+    // 1. Actualizar candidato
     const { error } = await supabase
       .from("candidatos")
       .update({ contratado })
@@ -284,20 +294,29 @@ export default function Home() {
 
     if (error) { console.log(error); return; }
 
-    // 2. Contar contratados reales DESPUÉS del update
+    // 2. Contar contratados de ESA vacante específica por ID
     const { data: contratadosVacante } = await supabase
+      .from("candidatos")
+      .select("id")
+      .eq("vacante_id", vacanteId)
+      .eq("contratado", true);
+
+    // Fallback: si no hay vacante_id, contar por nombre
+    const { data: contratadosPorNombre } = await supabase
       .from("candidatos")
       .select("id")
       .eq("vacante", vacanteNombre)
       .eq("contratado", true);
 
-    const cubiertosReales = contratadosVacante?.length || 0;
+    const cubiertosReales = contratadosVacante?.length
+      ? contratadosVacante.length
+      : contratadosPorNombre?.length || 0;
 
-    // 3. Obtener datos de la vacante
+    // 3. Obtener vacante por ID directamente
     const { data: vacanteData } = await supabase
       .from("vacantes")
       .select("*")
-      .eq("nombre", vacanteNombre)
+      .eq("id", vacanteId)
       .single();
 
     if (!vacanteData) {
@@ -312,16 +331,15 @@ export default function Home() {
         ? "Cubierta"
         : "Abierta";
 
-    // 5. Actualizar vacante con cubiertos y estatus
+    // 5. Actualizar vacante
     await supabase
       .from("vacantes")
       .update({
         cubiertos: cubiertosReales,
         estatus:   nuevoEstatus,
       })
-      .eq("id", vacanteData.id);
+      .eq("id", vacanteId);
 
-    // 6. Refrescar ambas tablas
     obtenerVacantes();
     obtenerCandidatos();
   };
@@ -408,10 +426,12 @@ export default function Home() {
   // CALENDARIO
   // =====================================================
 
-  const candidatosFecha = candidatos.filter((candidato) => {
-    const fecha = new Date(candidato.created_at);
-    return fecha.toDateString() === fechaSeleccionada.toDateString();
-  });
+  const candidatosFecha = fechaSeleccionada
+    ? candidatos.filter((candidato) => {
+        const fecha = new Date(candidato.created_at);
+        return fecha.toDateString() === fechaSeleccionada.toDateString();
+      })
+    : [];
 
   // =====================================================
   // REPORTE SEMANAL
@@ -584,9 +604,11 @@ export default function Home() {
                 <tr className="bg-gray-200">
                   <th className="p-4 text-left">Vacante</th>
                   <th className="p-4 text-left">Cliente</th>
+                  <th className="p-4 text-left">Fecha Req.</th>
                   <th className="p-4 text-left">Solicitados</th>
                   <th className="p-4 text-left">Cubiertos</th>
                   <th className="p-4 text-left">Pendientes</th>
+                  <th className="p-4 text-left">Estatus</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -595,10 +617,20 @@ export default function Home() {
                   <tr key={v.id} className="border-b">
                     <td className="p-4">{v.nombre}</td>
                     <td className="p-4">{v.cliente}</td>
+                    <td className="p-4">
+                      {new Date(v.created_at).toLocaleDateString("es-MX")}
+                    </td>
                     <td className="p-4">{v.solicitados}</td>
                     <td className="p-4">{v.cubiertos}</td>
                     <td className="p-4">
                       {v.solicitados - v.cubiertos}
+                    </td>
+                    <td className="p-4">
+                      <span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
+                        v.estatus === "Cubierta" ? "bg-green-600" : "bg-yellow-500"
+                      }`}>
+                        {v.estatus}
+                      </span>
                     </td>
                     <td className="p-4">
                       <button
@@ -621,22 +653,23 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-4">
 
-            {/* VACANTE — del catálogo, auto-llena cliente */}
+            {/* VACANTE — de las vacantes activas en DB, guarda ID */}
             <select
-              value={vacante}
+              value={vacanteIdSeleccionada}
               onChange={(e) => {
-                const seleccion = CATALOGO_VACANTES.find(
-                  (v) => v.vacante === e.target.value
-                );
-                setVacante(e.target.value);
-                if (seleccion) setCliente(seleccion.cliente);
+                const v = vacantes.find((v) => v.id === e.target.value);
+                setVacanteIdSeleccionada(e.target.value);
+                if (v) {
+                  setVacante(v.nombre);
+                  setCliente(v.cliente);
+                }
               }}
               className="border p-4 rounded-xl"
             >
               <option value="">Selecciona Vacante</option>
-              {CATALOGO_VACANTES.map((v) => (
-                <option key={v.vacante} value={v.vacante}>
-                  {v.vacante} — {v.cliente}
+              {vacantes.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.nombre} — {v.cliente} ({new Date(v.created_at).toLocaleDateString("es-MX")})
                 </option>
               ))}
             </select>
@@ -710,7 +743,7 @@ export default function Home() {
               onChange={(value) =>
                 setFechaSeleccionada(value as Date)
               }
-              value={fechaSeleccionada}
+              value={fechaSeleccionada ?? new Date()}
             />
           </div>
 
@@ -761,8 +794,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ width: "100%", height: 400 }}>
-            <ResponsiveContainer>
+          <div style={{ width: "100%", height: 400, minHeight: 400 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={graficaSemanal}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="dia" />
@@ -827,6 +860,7 @@ export default function Home() {
                           actualizarContratado(
                             candidato.id,
                             !candidato.contratado,
+                            candidato.vacante_id || candidato.id,
                             candidato.vacante
                           )
                         }
