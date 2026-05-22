@@ -87,6 +87,9 @@ export default function Home() {
     setVacanteIdSeleccionada,
   ] = useState("");
 
+  const [candidatos, setCandidatos] =
+    useState<any[]>([]);
+
   // =====================================================
   // STATES VACANTES
   // =====================================================
