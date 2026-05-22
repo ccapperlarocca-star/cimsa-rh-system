@@ -626,8 +626,8 @@ if (contratado) {
             Guardar Vacante
           </button>
 
-          {/* TABLA VACANTES */}
-          <div className="overflow-x-auto mt-8">
+             {/* TABLA VACANTES */}
+          <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-200">
@@ -650,102 +650,35 @@ if (contratado) {
                       {new Date(v.created_at).toLocaleDateString("es-MX")}
                     </td>
                     <td className="p-4">{v.solicitados}</td>
+                    <td className="p-4">{v.cubiertos}</td>
+                    <td className="p-4">{v.solicitados - v.cubiertos}</td>
                     <td className="p-4">
-
-  {
-
-    candidatos.filter(
-
-      (c) =>
-
-        c.vacante_id === v.id &&
-
-        c.estatus === "Contratado"
-    ).length
-
-  }
-
-</td>
-              
-                      <td className="p-4">
-
-  {
-
-    Math.max(
-
-      0,
-
-      v.solicitados -
-
-      candidatos.filter(
-
-        (c) =>
-
-          c.vacante_id === v.id &&
-
-          c.estatus === "Contratado"
-      ).length
-    )
-
-  }
-
-<td className="p-4">
-
-  <span
-    className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
-
-      candidatos.filter(
-
-        (c) =>
-
-          c.vacante_id === v.id &&
-
-          c.estatus === "Contratado"
-      ).length >= v.solicitados
-
-        ? "bg-green-600"
-
-        : "bg-yellow-500"
-    }`}
-  >
-
-    {
-
-      candidatos.filter(
-
-        (c) =>
-
-          c.vacante_id === v.id &&
-
-          c.estatus === "Contratado"
-      ).length >= v.solicitados
-
-        ? "Cubierta"
-
-        : "Abierta"
-    }
-
-  </span>
-
-</td>
-                    
-<td className="p-4">
-  <button
-    onClick={() => eliminarVacante(v.id)}
-    className="bg-red-600 text-white px-4 py-2 rounded-lg"
-  >
-    Eliminar
-  </button>
-</td>
-
-</tr>
-))}
+                      <select
+                        value={v.estatus}
+                        onChange={(e) => actualizarEstatusVacante(v.id, e.target.value)}
+                        className={`px-3 py-2 rounded-lg text-white font-semibold border-0 cursor-pointer ${
+                          v.estatus === "Cubierta" ? "bg-green-600" : "bg-yellow-500"
+                        }`}
+                      >
+                        <option value="Abierta"  className="bg-white text-black">Abierta</option>
+                        <option value="Cubierta" className="bg-white text-black">Cubierta</option>
+                      </select>
+                    </td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => eliminarVacante(v.id)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
-
-        {/* FORM CANDIDATOS */}
+{/* FORM CANDIDATOS */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <h2 className="text-2xl font-bold mb-6">Registrar Candidato</h2>
 
