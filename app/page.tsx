@@ -193,6 +193,7 @@ export default function Home() {
           medio_captacion: medioCaptacion,
           asistencia: "Pendiente",
           contratado: false,
+          estatus: "Pendiente",
         },
       ]);
 
@@ -827,6 +828,9 @@ export default function Home() {
                   <th className="p-4 text-left">Localidad</th>
                   <th className="p-4 text-left">Captación</th>
                   <th className="p-4 text-left">Asistencia</th>
+                  <th className="p-4 text-left">
+  Estatus
+</th>
                   <th className="p-4 text-left">Contratado</th>
                   <th className="p-4 text-left">Fecha</th>
                   <th className="p-4 text-left">Acciones</th>
@@ -857,6 +861,62 @@ export default function Home() {
                         <option>Reagendado</option>
                       </select>
                     </td>
+                    <td className="p-4">
+
+  <select
+
+    value={candidato.estatus || "Pendiente"}
+
+    onChange={async (e) => {
+
+      const nuevoEstatus =
+        e.target.value;
+
+      await supabase
+        .from("candidatos")
+        .update({
+          estatus: nuevoEstatus
+        })
+        .eq(
+          "id",
+          candidato.id
+        );
+
+      obtenerCandidatos();
+
+      obtenerVacantes();
+    }}
+
+    className="border rounded-lg p-2"
+  >
+
+    <option value="Pendiente">
+      Pendiente
+    </option>
+
+    <option value="Acudió">
+      Acudió
+    </option>
+
+    <option value="No acudió">
+      No acudió
+    </option>
+
+    <option value="Reagendado">
+      Reagendado
+    </option>
+
+    <option value="Contratado">
+      Contratado
+    </option>
+
+    <option value="Descartado">
+      Descartado
+    </option>
+
+  </select>
+
+</td>
                     <td className="p-4">
                       <button
                         onClick={() =>
