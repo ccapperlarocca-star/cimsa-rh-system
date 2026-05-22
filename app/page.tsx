@@ -666,7 +666,7 @@ if (contratado) {
   }
 
 </td>
-                    <td className="p-4">
+              
                       <td className="p-4">
 
   {
@@ -689,15 +689,45 @@ if (contratado) {
 
   }
 
+<td className="p-4">
+
+  <span
+    className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
+
+      candidatos.filter(
+
+        (c) =>
+
+          c.vacante_id === v.id &&
+
+          c.estatus === "Contratado"
+      ).length >= v.solicitados
+
+        ? "bg-green-600"
+
+        : "bg-yellow-500"
+    }`}
+  >
+
+    {
+
+      candidatos.filter(
+
+        (c) =>
+
+          c.vacante_id === v.id &&
+
+          c.estatus === "Contratado"
+      ).length >= v.solicitados
+
+        ? "Cubierta"
+
+        : "Abierta"
+    }
+
+  </span>
+
 </td>
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
-                        v.estatus === "Cubierta" ? "bg-green-600" : "bg-yellow-500"
-                      }`}>
-                        {v.estatus}
-                      </span>
-                    </td>
                     
 <td className="p-4">
   <button
