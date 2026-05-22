@@ -1104,9 +1104,6 @@ if (contratado) {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-
       </div>
     </main>
   );
