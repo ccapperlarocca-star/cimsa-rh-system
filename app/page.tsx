@@ -21,11 +21,7 @@ import {
 // CATÁLOGO DE VACANTES Y CLIENTES
 // =====================================================
 
-const CATALOGO_VACANTES: {
-  vacante: string;
-  cliente: string;
-}[] = [
-  // OPERACIONES
+const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
   { vacante: "MECÁNICO",                cliente: "OPERACIONES" },
   { vacante: "SOLDADOR",                cliente: "OPERACIONES" },
   { vacante: "ELÉCTRICO",               cliente: "OPERACIONES" },
@@ -34,19 +30,11 @@ const CATALOGO_VACANTES: {
   { vacante: "AYUDANTE LARGOS NORTE",   cliente: "OPERACIONES" },
   { vacante: "AYUDANTE FERROPAK",       cliente: "OPERACIONES" },
   { vacante: "CORTADOR",                cliente: "OPERACIONES" },
-
-  // HISE
   { vacante: "SUPERVISOR DE SEGURIDAD", cliente: "HISE" },
   { vacante: "AUXILIAR ADMIN HISE",     cliente: "HISE" },
-
-  // PROGRAMACIÓN
   { vacante: "CHOFER",                  cliente: "PROGRAMACIÓN" },
-
-  // ALMACÉN CIMSA
   { vacante: "ALMACENISTA",             cliente: "ALMACÉN CIMSA" },
   { vacante: "AUXILIAR DE COMPRAS",     cliente: "ALMACÉN CIMSA" },
-
-  // HUGO CASADOS
   { vacante: "CODIFICADOR",             cliente: "HUGO CASADOS" },
   { vacante: "GESTIÓN",                 cliente: "HUGO CASADOS" },
   { vacante: "PROGRAMADOR TERNIUM",     cliente: "HUGO CASADOS" },
@@ -58,84 +46,32 @@ const CATALOGO_VACANTES: {
 
 export default function Home() {
 
-  // =====================================================
   // STATES CANDIDATOS
-  // =====================================================
+  const [nombre, setNombre]               = useState("");
+  const [telefono, setTelefono]           = useState("");
+  const [vacante, setVacante]             = useState("");
+  const [vacanteId, setVacanteId]         = useState("");
+  const [cliente, setCliente]             = useState("");
+  const [localidad, setLocalidad]         = useState("");
+  const [medioCaptacion, setMedioCaptacion] = useState("");
+  const [candidatos, setCandidatos]       = useState<any[]>([]);
 
-  const [nombre, setNombre] =
-    useState("");
-
-  const [telefono, setTelefono] =
-    useState("");
-
-  const [vacante, setVacante] =
-    useState("");
-
-  const [cliente, setCliente] =
-    useState("");
-
-  const [localidad, setLocalidad] =
-    useState("");
-
-  const [
-    medioCaptacion,
-    setMedioCaptacion,
-  ] = useState("");
-
-  const [
-    vacanteIdSeleccionada,
-    setVacanteIdSeleccionada,
-  ] = useState("");
-
-  const [candidatos, setCandidatos] =
-    useState<any[]>([]);
-
-  // =====================================================
   // STATES VACANTES
-  // =====================================================
+  const [vacanteNueva, setVacanteNueva]       = useState("");
+  const [clienteVacante, setClienteVacante]   = useState("");
+  const [solicitados, setSolicitados]         = useState("");
+  const [vacantes, setVacantes]               = useState<any[]>([]);
 
-  const [
-    vacanteNueva,
-    setVacanteNueva,
-  ] = useState("");
-
-  const [
-    clienteVacante,
-    setClienteVacante,
-  ] = useState("");
-
-  const [
-    solicitados,
-    setSolicitados,
-  ] = useState("");
-
-  const [vacantes, setVacantes] =
-    useState<any[]>([]);
-
-  // =====================================================
   // CALENDARIO
-  // =====================================================
-
-  const [
-    fechaSeleccionada,
-    setFechaSeleccionada,
-  ] = useState<Date | null>(null);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
+  const [offsetSemana, setOffsetSemana]           = useState(0);
 
   useEffect(() => {
     setFechaSeleccionada(new Date());
   }, []);
 
   // =====================================================
-  // SEMANAS
-  // =====================================================
-
-  const [
-    offsetSemana,
-    setOffsetSemana,
-  ] = useState(0);
-
-  // =====================================================
-  // OBTENER CANDIDATOS
+  // OBTENER DATOS
   // =====================================================
 
   const obtenerCandidatos = async () => {
@@ -143,21 +79,15 @@ export default function Home() {
       .from("candidatos")
       .select("*")
       .order("created_at", { ascending: false });
-
     if (error) { console.log(error); return; }
     setCandidatos(data || []);
   };
-
-  // =====================================================
-  // OBTENER VACANTES
-  // =====================================================
 
   const obtenerVacantes = async () => {
     const { data, error } = await supabase
       .from("vacantes")
       .select("*")
       .order("created_at", { ascending: false });
-
     if (error) { console.log(error); return; }
     setVacantes(data || []);
   };
@@ -167,50 +97,24 @@ export default function Home() {
   // =====================================================
 
   const guardarCandidato = async () => {
-    if (
-      !nombre ||
-      !telefono ||
-      !vacante ||
-      !vacanteIdSeleccionada ||
-      !cliente ||
-      !localidad ||
-      !medioCaptacion
-    ) {
+    if (!nombre || !telefono || !vacante || !vacanteId || !cliente || !localidad || !medioCaptacion) {
       alert("Completa todos los campos");
       return;
     }
-
-    const { error } = await supabase
-      .from("candidatos")
-      .insert([
-        {
-          nombre,
-          telefono,
-          vacante,
-          vacante_id: vacanteIdSeleccionada,
-          cliente,
-          localidad,
-          medio_captacion: medioCaptacion,
-          asistencia: "Pendiente",
-          contratado: false,
-          estatus: "Pendiente",
-        },
-      ]);
-
-    if (error) {
-      console.log(error);
-      alert(error.message);
-      return;
-    }
-
-    setNombre("");
-    setTelefono("");
-    setVacante("");
-    setVacanteIdSeleccionada("");
-    setCliente("");
-    setLocalidad("");
-    setMedioCaptacion("");
-
+    const { error } = await supabase.from("candidatos").insert([{
+      nombre,
+      telefono,
+      vacante,
+      vacante_id: vacanteId,
+      cliente,
+      localidad,
+      medio_captacion: medioCaptacion,
+      asistencia: "Pendiente",
+      contratado: false,
+    }]);
+    if (error) { console.log(error); alert(error.message); return; }
+    setNombre(""); setTelefono(""); setVacante(""); setVacanteId("");
+    setCliente(""); setLocalidad(""); setMedioCaptacion("");
     obtenerCandidatos();
   };
 
@@ -223,41 +127,20 @@ export default function Home() {
       alert("Completa todos los campos");
       return;
     }
-
-    // Verificar si ya existe una vacante con ese nombre
-    const yaExiste = vacantes.find(
-      (v) => v.nombre === vacanteNueva
-    );
-
+    const yaExiste = vacantes.find((v) => v.nombre === vacanteNueva);
     if (yaExiste) {
-      const confirmar = confirm(
-        `Ya existe una vacante "${vacanteNueva}" (${yaExiste.estatus}). ¿Deseas agregar otra de todas formas?`
-      );
-      if (!confirmar) return;
+      const ok = confirm(`Ya existe "${vacanteNueva}" (${yaExiste.estatus}). ¿Agregar otro requerimiento?`);
+      if (!ok) return;
     }
-
-    const { error } = await supabase
-      .from("vacantes")
-      .insert([
-        {
-          nombre:     vacanteNueva,
-          cliente:    clienteVacante,
-          solicitados: Number(solicitados),
-          cubiertos:  0,
-          estatus:    "Abierta",
-        },
-      ]);
-
-    if (error) {
-      console.log(error);
-      alert(error.message);
-      return;
-    }
-
-    setVacanteNueva("");
-    setClienteVacante("");
-    setSolicitados("");
-
+    const { error } = await supabase.from("vacantes").insert([{
+      nombre: vacanteNueva,
+      cliente: clienteVacante,
+      solicitados: Number(solicitados),
+      cubiertos: 0,
+      estatus: "Abierta",
+    }]);
+    if (error) { console.log(error); alert(error.message); return; }
+    setVacanteNueva(""); setClienteVacante(""); setSolicitados("");
     obtenerVacantes();
   };
 
@@ -265,201 +148,100 @@ export default function Home() {
   // ACTUALIZAR ASISTENCIA
   // =====================================================
 
-  const actualizarAsistencia = async (
-    id: string,
-    asistencia: string
-  ) => {
+  const actualizarAsistencia = async (id: string, asistencia: string) => {
     const { error } = await supabase
-      .from("candidatos")
-      .update({ asistencia })
-      .eq("id", id);
-
+      .from("candidatos").update({ asistencia }).eq("id", id);
     if (error) { console.log(error); return; }
     obtenerCandidatos();
   };
 
   // =====================================================
-  // CONTRATADO + HEADCOUNT
-  // FIX: contar contratados DESPUÉS de confirmar el update
+  // CONTRATADO + HEADCOUNT (por vacante_id)
   // =====================================================
 
   const actualizarContratado = async (
     id: string,
     contratado: boolean,
-    vacanteId: string,
-    vacanteNombre: string
+    vId: string,
   ) => {
-    // VALIDAR SI YA HAY UN CONTRATADO
-
-if (contratado) {
-
-  const yaContratados =
-    candidatos.filter(
-
-      (c) =>
-
-        c.vacante_id === vacanteId &&
-
-        c.contratado === true
-    );
-
-  // SI YA EXISTE UNO
-
-  if (yaContratados.length >= 1) {
-
-    alert(
-      "La vacante ya está cubierta. Reasigna el candidato a otra vacante."
-    );
-
-    return;
-  }
-}
-
     // 1. Actualizar candidato
     const { error } = await supabase
-      .from("candidatos")
-      .update({ contratado })
-      .eq("id", id);
-
+      .from("candidatos").update({ contratado }).eq("id", id);
     if (error) { console.log(error); return; }
 
-    // 2. Contar contratados de ESA vacante específica por ID
-    const { data: contratadosVacante } = await supabase
-      .from("candidatos")
-      .select("id")
-      .eq("vacante_id", vacanteId)
-      .eq("contratado", true);
+    // 2. Contar contratados de esa vacante exacta por ID
+    const { data: contratadosData } = await supabase
+      .from("candidatos").select("id")
+      .eq("vacante_id", vId).eq("contratado", true);
+    const cubiertosReales = contratadosData?.length || 0;
 
-    // Fallback: si no hay vacante_id, contar por nombre
-    const { data: contratadosPorNombre } = await supabase
-      .from("candidatos")
-      .select("id")
-      .eq("vacante", vacanteNombre)
-      .eq("contratado", true);
-
-    const cubiertosReales = contratadosVacante?.length
-      ? contratadosVacante.length
-      : contratadosPorNombre?.length || 0;
-
-    // 3. Obtener vacante por ID directamente
+    // 3. Obtener vacante por ID
     const { data: vacanteData } = await supabase
-      .from("vacantes")
-      .select("*")
-      .eq("id", vacanteId)
-      .single();
+      .from("vacantes").select("*").eq("id", vId).single();
+    if (!vacanteData) { obtenerVacantes(); obtenerCandidatos(); return; }
 
-    if (!vacanteData) {
-      obtenerVacantes();
-      obtenerCandidatos();
-      return;
-    }
-
-    // 4. Determinar nuevo estatus
-    const nuevoEstatus =
-      cubiertosReales >= vacanteData.solicitados
-        ? "Cubierta"
-        : "Abierta";
+    // 4. Calcular estatus
+    const nuevoEstatus = cubiertosReales >= vacanteData.solicitados ? "Cubierta" : "Abierta";
 
     // 5. Actualizar vacante
-    await supabase
-      .from("vacantes")
-      .update({
-        cubiertos: cubiertosReales,
-        estatus:   nuevoEstatus,
-      })
-      .eq("id", vacanteId);
+    await supabase.from("vacantes")
+      .update({ cubiertos: cubiertosReales, estatus: nuevoEstatus })
+      .eq("id", vId);
 
     obtenerVacantes();
     obtenerCandidatos();
   };
 
   // =====================================================
-  // ACTUALIZAR ESTATUS VACANTE MANUALMENTE
+  // ACTUALIZAR ESTATUS VACANTE (manual)
   // =====================================================
 
-  const actualizarEstatusVacante = async (
-    id: string,
-    nuevoEstatus: string
-  ) => {
+  const actualizarEstatusVacante = async (id: string, nuevoEstatus: string) => {
     if (!id) return;
-
     const { data, error } = await supabase
-      .from("vacantes")
-      .update({ estatus: nuevoEstatus })
-      .eq("id", id)
-      .select();
-
+      .from("vacantes").update({ estatus: nuevoEstatus }).eq("id", id).select();
     if (error || !data || data.length === 0) {
       console.log("Error actualizando estatus:", error);
       return;
     }
-
     obtenerVacantes();
   };
 
   // =====================================================
-  // ELIMINAR CANDIDATO
+  // ELIMINAR
   // =====================================================
 
   const eliminarCandidato = async (id: string) => {
-    const confirmar = confirm("¿Eliminar candidato?");
-    if (!confirmar) return;
-
-    const { error } = await supabase
-      .from("candidatos")
-      .delete()
-      .eq("id", id);
-
+    if (!confirm("¿Eliminar candidato?")) return;
+    const { error } = await supabase.from("candidatos").delete().eq("id", id);
     if (error) { console.log(error); alert(error.message); return; }
     obtenerCandidatos();
   };
 
-  // =====================================================
-  // ELIMINAR VACANTE
-  // =====================================================
-
   const eliminarVacante = async (id: string) => {
-    const confirmar = confirm("¿Eliminar vacante?");
-    if (!confirmar) return;
-
-    const { error } = await supabase
-      .from("vacantes")
-      .delete()
-      .eq("id", id);
-
+    if (!confirm("¿Eliminar vacante?")) return;
+    const { error } = await supabase.from("vacantes").delete().eq("id", id);
     if (error) { console.log(error); alert(error.message); return; }
     obtenerVacantes();
   };
 
   // =====================================================
-  // KPIs RH
+  // KPIs
   // =====================================================
 
   const acudieron   = candidatos.filter((c) => c.asistencia === "Acudió").length;
   const faltaron    = candidatos.filter((c) => c.asistencia === "Faltó").length;
   const reagendados = candidatos.filter((c) => c.asistencia === "Reagendado").length;
   const contratados = candidatos.filter((c) => c.contratado === true).length;
-
-  const conversion  = acudieron > 0
-    ? ((contratados / acudieron) * 100).toFixed(1)
-    : "0";
-
-  // =====================================================
-  // KPIs VACANTES
-  // =====================================================
+  const conversion  = acudieron > 0 ? ((contratados / acudieron) * 100).toFixed(1) : "0";
 
   const vacantesAbiertas  = vacantes.filter((v) => v.estatus === "Abierta").length;
   const vacantesCubiertas = vacantes.filter((v) => v.estatus === "Cubierta").length;
 
-  // =====================================================
-  // CALENDARIO
-  // =====================================================
-
   const candidatosFecha = fechaSeleccionada
-    ? candidatos.filter((candidato) => {
-        const fecha = new Date(candidato.created_at);
-        return fecha.toDateString() === fechaSeleccionada.toDateString();
-      })
+    ? candidatos.filter((c) =>
+        new Date(c.created_at).toDateString() === fechaSeleccionada.toDateString()
+      )
     : [];
 
   // =====================================================
@@ -469,33 +251,24 @@ if (contratado) {
   const graficaSemanal = useMemo(() => {
     const hoy = new Date();
     hoy.setDate(hoy.getDate() + offsetSemana * 7);
-
     const inicioSemana = new Date(hoy);
     inicioSemana.setDate(hoy.getDate() - hoy.getDay());
     inicioSemana.setHours(0, 0, 0, 0);
-
     const finSemana = new Date(inicioSemana);
     finSemana.setDate(inicioSemana.getDate() + 6);
     finSemana.setHours(23, 59, 59, 999);
 
-    const dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-    return dias.map((dia, index) => {
-      const candidatosSemana = candidatos.filter((c) => {
-        const fecha = new Date(c.created_at);
-        return (
-          fecha >= inicioSemana &&
-          fecha <= finSemana &&
-          fecha.getDay() === index
-        );
+    return ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"].map((dia, index) => {
+      const cs = candidatos.filter((c) => {
+        const f = new Date(c.created_at);
+        return f >= inicioSemana && f <= finSemana && f.getDay() === index;
       });
-
       return {
         dia,
-        acudieron:   candidatosSemana.filter((c) => c.asistencia === "Acudió").length,
-        faltaron:    candidatosSemana.filter((c) => c.asistencia === "Faltó").length,
-        reagendados: candidatosSemana.filter((c) => c.asistencia === "Reagendado").length,
-        contratados: candidatosSemana.filter((c) => c.contratado === true).length,
+        acudieron:   cs.filter((c) => c.asistencia === "Acudió").length,
+        faltaron:    cs.filter((c) => c.asistencia === "Faltó").length,
+        reagendados: cs.filter((c) => c.asistencia === "Reagendado").length,
+        contratados: cs.filter((c) => c.contratado === true).length,
       };
     });
   }, [candidatos, offsetSemana]);
@@ -507,15 +280,16 @@ if (contratado) {
   useEffect(() => {
     obtenerCandidatos();
     obtenerVacantes();
-
-    // Refrescar cada 30 segundos para mantener ids sincronizados
     const interval = setInterval(() => {
       obtenerCandidatos();
       obtenerVacantes();
     }, 30000);
-
     return () => clearInterval(interval);
   }, []);
+
+  // =====================================================
+  // RENDER
+  // =====================================================
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -523,12 +297,8 @@ if (contratado) {
 
         {/* HEADER */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
-          <h1 className="text-5xl font-bold text-blue-900 mb-2">
-            CIMSA RH SYSTEM
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Sistema de Reclutamiento y Headcount
-          </p>
+          <h1 className="text-5xl font-bold text-blue-900 mb-2">CIMSA RH SYSTEM</h1>
+          <p className="text-gray-600 text-lg">Sistema de Reclutamiento y Headcount</p>
         </div>
 
         {/* KPIs RH */}
@@ -563,6 +333,7 @@ if (contratado) {
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <h2 className="text-2xl font-bold mb-6">Gestión de Vacantes</h2>
 
+          {/* KPIs VACANTES */}
           <div className="grid md:grid-cols-3 gap-4 mb-8">
             <div className="bg-blue-900 text-white p-6 rounded-xl">
               <h3>Vacantes Abiertas</h3>
@@ -578,30 +349,23 @@ if (contratado) {
             </div>
           </div>
 
-          {/* FORM VACANTES — con catálogo */}
+          {/* FORM NUEVA VACANTE — usa catálogo, auto-llena cliente */}
           <div className="grid md:grid-cols-3 gap-4 mb-6">
-
-            {/* SELECTOR DE VACANTE (catálogo) — auto-llena cliente */}
             <select
               value={vacanteNueva}
               onChange={(e) => {
-                const seleccion = CATALOGO_VACANTES.find(
-                  (v) => v.vacante === e.target.value
-                );
+                const sel = CATALOGO_VACANTES.find((v) => v.vacante === e.target.value);
                 setVacanteNueva(e.target.value);
-                if (seleccion) setClienteVacante(seleccion.cliente);
+                if (sel) setClienteVacante(sel.cliente);
               }}
               className="border p-4 rounded-xl"
             >
               <option value="">Selecciona Vacante</option>
               {CATALOGO_VACANTES.map((v) => (
-                <option key={v.vacante} value={v.vacante}>
-                  {v.vacante}
-                </option>
+                <option key={v.vacante} value={v.vacante}>{v.vacante}</option>
               ))}
             </select>
 
-            {/* CLIENTE — se llena automático, editable si se necesita */}
             <input
               type="text"
               placeholder="Cliente (auto)"
@@ -621,12 +385,12 @@ if (contratado) {
 
           <button
             onClick={guardarVacante}
-            className="bg-blue-900 text-white px-6 py-3 rounded-xl"
+            className="bg-blue-900 text-white px-6 py-3 rounded-xl mb-8"
           >
             Guardar Vacante
           </button>
 
-             {/* TABLA VACANTES */}
+          {/* TABLA VACANTES */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -678,22 +442,20 @@ if (contratado) {
             </table>
           </div>
         </div>
-{/* FORM CANDIDATOS */}
+
+        {/* FORM CANDIDATOS */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <h2 className="text-2xl font-bold mb-6">Registrar Candidato</h2>
 
           <div className="grid md:grid-cols-2 gap-4">
 
-            {/* VACANTE — de las vacantes activas en DB, guarda ID */}
+            {/* VACANTE — muestra requerimientos activos de la DB con fecha para distinguir duplicados */}
             <select
-              value={vacanteIdSeleccionada}
+              value={vacanteId}
               onChange={(e) => {
-                const v = vacantes.find((v) => v.id === e.target.value);
-                setVacanteIdSeleccionada(e.target.value);
-                if (v) {
-                  setVacante(v.nombre);
-                  setCliente(v.cliente);
-                }
+                const sel = vacantes.find((v) => v.id === e.target.value);
+                setVacanteId(e.target.value);
+                if (sel) { setVacante(sel.nombre); setCliente(sel.cliente); }
               }}
               className="border p-4 rounded-xl"
             >
@@ -705,7 +467,6 @@ if (contratado) {
               ))}
             </select>
 
-            {/* CLIENTE — se llena automático */}
             <input
               type="text"
               placeholder="Cliente (auto)"
@@ -714,7 +475,6 @@ if (contratado) {
               className="border p-4 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
             />
 
-            {/* NOMBRE */}
             <input
               type="text"
               placeholder="Nombre"
@@ -723,7 +483,6 @@ if (contratado) {
               className="border p-4 rounded-xl"
             />
 
-            {/* TELÉFONO */}
             <input
               type="text"
               placeholder="Teléfono"
@@ -732,7 +491,6 @@ if (contratado) {
               className="border p-4 rounded-xl"
             />
 
-            {/* LOCALIDAD */}
             <input
               type="text"
               placeholder="Localidad"
@@ -741,7 +499,6 @@ if (contratado) {
               className="border p-4 rounded-xl"
             />
 
-            {/* CAPTACIÓN */}
             <select
               value={medioCaptacion}
               onChange={(e) => setMedioCaptacion(e.target.value)}
@@ -767,32 +524,23 @@ if (contratado) {
         {/* CALENDARIO */}
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div className="bg-white p-8 rounded-2xl shadow">
-            <h2 className="text-2xl font-bold mb-6">
-              Calendario de Asistencias
-            </h2>
+            <h2 className="text-2xl font-bold mb-6">Calendario de Asistencias</h2>
             <Calendar
-              onChange={(value) =>
-                setFechaSeleccionada(value as Date)
-              }
+              onChange={(value) => setFechaSeleccionada(value as Date)}
               value={fechaSeleccionada ?? new Date()}
             />
           </div>
 
-          {/* ASISTENCIAS DEL DÍA */}
           <div className="bg-white p-8 rounded-2xl shadow">
             <h2 className="text-2xl font-bold mb-6">Asistencias del Día</h2>
             <div className="space-y-4">
-              {candidatosFecha.length === 0 && (
-                <p>No hay candidatos este día</p>
-              )}
-              {candidatosFecha.map((candidato) => (
-                <div key={candidato.id} className="border p-4 rounded-xl">
-                  <p className="font-bold">{candidato.nombre}</p>
-                  <p>{candidato.vacante}</p>
-                  <p>{candidato.asistencia}</p>
-                  <p>
-                    {candidato.contratado ? "Contratado" : "No contratado"}
-                  </p>
+              {candidatosFecha.length === 0 && <p>No hay candidatos este día</p>}
+              {candidatosFecha.map((c) => (
+                <div key={c.id} className="border p-4 rounded-xl">
+                  <p className="font-bold">{c.nombre}</p>
+                  <p>{c.vacante}</p>
+                  <p>{c.asistencia}</p>
+                  <p>{c.contratado ? "Contratado" : "No contratado"}</p>
                 </div>
               ))}
             </div>
@@ -807,24 +555,17 @@ if (contratado) {
               <button
                 onClick={() => setOffsetSemana(offsetSemana - 1)}
                 className="bg-gray-200 px-4 py-2 rounded-lg"
-              >
-                ← Semana anterior
-              </button>
+              >← Semana anterior</button>
               <button
                 onClick={() => setOffsetSemana(0)}
                 className="bg-blue-900 text-white px-4 py-2 rounded-lg"
-              >
-                Semana actual
-              </button>
+              >Semana actual</button>
               <button
                 onClick={() => setOffsetSemana(offsetSemana + 1)}
                 className="bg-gray-200 px-4 py-2 rounded-lg"
-              >
-                Semana siguiente →
-              </button>
+              >Semana siguiente →</button>
             </div>
           </div>
-
           <div style={{ width: "100%", height: 400, minHeight: 400 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={graficaSemanal}>
@@ -855,35 +596,23 @@ if (contratado) {
                   <th className="p-4 text-left">Localidad</th>
                   <th className="p-4 text-left">Captación</th>
                   <th className="p-4 text-left">Asistencia</th>
-                  <th className="p-4 text-left">
-  Estatus
-</th>
-                  <th className="p-4 text-left">
-  Reasignar
-</th>
-
-<th className="p-4 text-left">Fecha</th>
-
-<th className="p-4 text-left">Acciones</th>
+                  <th className="p-4 text-left">Contratado</th>
+                  <th className="p-4 text-left">Fecha</th>
+                  <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {candidatos.map((candidato) => (
-                  <tr key={candidato.id} className="border-b">
-                    <td className="p-4">{candidato.nombre}</td>
-                    <td className="p-4">{candidato.vacante}</td>
-                    <td className="p-4">{candidato.cliente}</td>
-                    <td className="p-4">{candidato.localidad}</td>
-                    <td className="p-4">{candidato.medio_captacion}</td>
+                {candidatos.map((c) => (
+                  <tr key={c.id} className="border-b">
+                    <td className="p-4">{c.nombre}</td>
+                    <td className="p-4">{c.vacante}</td>
+                    <td className="p-4">{c.cliente}</td>
+                    <td className="p-4">{c.localidad}</td>
+                    <td className="p-4">{c.medio_captacion}</td>
                     <td className="p-4">
                       <select
-                        value={candidato.asistencia}
-                        onChange={(e) =>
-                          actualizarAsistencia(
-                            candidato.id,
-                            e.target.value
-                          )
-                        }
+                        value={c.asistencia}
+                        onChange={(e) => actualizarAsistencia(c.id, e.target.value)}
                         className="border rounded-lg p-2"
                       >
                         <option>Pendiente</option>
@@ -893,141 +622,21 @@ if (contratado) {
                       </select>
                     </td>
                     <td className="p-4">
-
-  <select
-
-    value={candidato.estatus || "Pendiente"}
-
-    onChange={async (e) => {
-
-      const nuevoEstatus =
-        e.target.value;
-
-      await supabase
-        .from("candidatos")
-        .update({
-          estatus: nuevoEstatus
-        })
-        .eq(
-          "id",
-          candidato.id
-        );
-
-      obtenerCandidatos();
-
-      obtenerVacantes();
-    }}
-
-    className="border rounded-lg p-2"
-  >
-
-    <option value="Pendiente">
-      Pendiente
-    </option>
-
-    <option value="Acudió">
-      Acudió
-    </option>
-
-    <option value="No acudió">
-      No acudió
-    </option>
-
-    <option value="Reagendado">
-      Reagendado
-    </option>
-
-    <option value="Contratado">
-      Contratado
-    </option>
-
-    <option value="Descartado">
-      Descartado
-    </option>
-
-  </select>
-
-</td>
-                   
+                      <button
+                        onClick={() => actualizarContratado(c.id, !c.contratado, c.vacante_id)}
+                        className={`px-4 py-2 rounded-lg text-white ${
+                          c.contratado ? "bg-green-600" : "bg-gray-500"
+                        }`}
+                      >
+                        {c.contratado ? "Sí" : "No"}
+                      </button>
+                    </td>
                     <td className="p-4">
-
-  <select
-
-    value={candidato.vacante_id || ""}
-
-    onChange={async (e) => {
-
-      const nuevaVacanteId =
-        e.target.value;
-
-      const vacanteNueva =
-        vacantes.find(
-
-          (v) =>
-            v.id == nuevaVacanteId
-        );
-
-      if (!vacanteNueva) return;
-
-      await supabase
-        .from("candidatos")
-        .update({
-
-          vacante_id:
-            nuevaVacanteId,
-
-          vacante:
-            vacanteNueva.nombre,
-
-          cliente:
-            vacanteNueva.cliente
-        })
-        .eq(
-          "id",
-          candidato.id
-        );
-
-      obtenerCandidatos();
-
-      obtenerVacantes();
-    }}
-
-    className="border rounded-lg p-2"
-  >
-
-    <option value="">
-      Reasignar
-    </option>
-
-    {vacantes
-
-      .filter(
-        (v) =>
-          v.estatus === "Abierta"
-      )
-
-      .map((v) => (
-
-        <option
-          key={v.id}
-          value={v.id}
-        >
-
-          {v.nombre} — {v.cliente}
-
-        </option>
-      ))}
-  </select>
-
-</td>
-                    <td className="p-4">
-                      {new Date(candidato.created_at).toLocaleDateString(
-                        "es-MX"
-                      )}
+                      {new Date(c.created_at).toLocaleDateString("es-MX")}
                     </td>
                     <td className="p-4">
                       <button
-                        onClick={() => eliminarCandidato(candidato.id)}
+                        onClick={() => eliminarCandidato(c.id)}
                         className="bg-red-600 text-white px-4 py-2 rounded-lg"
                       >
                         Eliminar
@@ -1037,6 +646,9 @@ if (contratado) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+
       </div>
     </main>
   );
