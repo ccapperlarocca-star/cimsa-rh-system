@@ -650,9 +650,46 @@ if (contratado) {
                       {new Date(v.created_at).toLocaleDateString("es-MX")}
                     </td>
                     <td className="p-4">{v.solicitados}</td>
-                    <td className="p-4">{v.cubiertos}</td>
                     <td className="p-4">
-                      {v.solicitados - v.cubiertos}
+
+  {
+
+    candidatos.filter(
+
+      (c) =>
+
+        c.vacante_id === v.id &&
+
+        c.estatus === "Contratado"
+    ).length
+
+  }
+
+</td>
+                    <td className="p-4">
+                      <td className="p-4">
+
+  {
+
+    Math.max(
+
+      0,
+
+      v.solicitados -
+
+      candidatos.filter(
+
+        (c) =>
+
+          c.vacante_id === v.id &&
+
+          c.estatus === "Contratado"
+      ).length
+    )
+
+  }
+
+</td>
                     </td>
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
@@ -858,7 +895,6 @@ if (contratado) {
                   <th className="p-4 text-left">
   Estatus
 </th>
-                  <th className="p-4 text-left">Contratado</th>
                   <th className="p-4 text-left">
   Reasignar
 </th>
@@ -949,25 +985,7 @@ if (contratado) {
   </select>
 
 </td>
-                    <td className="p-4">
-                      <button
-                        onClick={() =>
-                          actualizarContratado(
-                            candidato.id,
-                            !candidato.contratado,
-                            candidato.vacante_id || candidato.id,
-                            candidato.vacante
-                          )
-                        }
-                        className={`px-4 py-2 rounded-lg text-white ${
-                          candidato.contratado
-                            ? "bg-green-600"
-                            : "bg-gray-500"
-                        }`}
-                      >
-                        {candidato.contratado ? "Sí" : "No"}
-                      </button>
-                    </td>
+                   
                     <td className="p-4">
 
   <select
