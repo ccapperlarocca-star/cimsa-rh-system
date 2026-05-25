@@ -618,7 +618,7 @@ const conversionTernium =
         100
       ).toFixed(1)
     : "0";
-    
+
   // =====================================================
   // KPIs CIMSA
   // =====================================================
@@ -1023,7 +1023,7 @@ const conversionTernium =
             </div>
 
             {/* TERNIUM ABIERTAS */}
-            <div className="bg-yellow-500 text-white p-6 rounded-xl">
+            <div className="bg-blue-900 text-white p-6 rounded-xl">
 
               <h3>Vacantes Ternium Abiertas</h3>
 
@@ -1034,7 +1034,7 @@ const conversionTernium =
             </div>
 
             {/* TERNIUM CUBIERTAS */}
-            <div className="bg-purple-600 text-white p-6 rounded-xl">
+            <div className="bg-green-600 text-white p-6 rounded-xl">
 
               <h3>Vacantes Ternium Cubiertas</h3>
 
