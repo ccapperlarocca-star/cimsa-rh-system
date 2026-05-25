@@ -63,6 +63,14 @@ export default function Home() {
   const [vacantes, setVacantes]               = useState<any[]>([]);
 
   // =====================================================
+// PAGINACIÓN VACANTES
+// =====================================================
+
+const [paginaVacantes, setPaginaVacantes] = useState(1);
+
+const vacantesPorPagina = 4;
+
+  // =====================================================
 // REASIGNACIÓN
 // =====================================================
 
@@ -532,6 +540,18 @@ if (nuevoEstatus === "Cubierta") {
   (v) => v.estatus === "Abierta" &&
   v.cubiertos < v.solicitados
 );
+const indiceInicial =
+  (paginaVacantes - 1) * vacantesPorPagina;
+
+const indiceFinal =
+  indiceInicial + vacantesPorPagina;
+
+const vacantesPaginadas =
+  vacantes.slice(indiceInicial, indiceFinal);
+
+const totalPaginas = Math.ceil(
+  vacantes.length / vacantesPorPagina
+);
 
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
@@ -702,7 +722,7 @@ if (nuevoEstatus === "Cubierta") {
                 </tr>
               </thead>
               <tbody>
-                {vacantes.map((v) => (
+                {vacantesPaginadas.map((v) => (
                   <tr key={v.id} className="border-b">
                     <td className="p-4">{v.nombre}</td>
                     <td className="p-4">{v.cliente}</td>
@@ -758,6 +778,35 @@ if (nuevoEstatus === "Cubierta") {
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-center items-center gap-4 mt-6">
+
+  <button
+    onClick={() =>
+      setPaginaVacantes((prev) =>
+        Math.max(prev - 1, 1)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    ← Anterior
+  </button>
+
+  <span className="font-semibold">
+    Página {paginaVacantes} de {totalPaginas}
+  </span>
+
+  <button
+    onClick={() =>
+      setPaginaVacantes((prev) =>
+        Math.min(prev + 1, totalPaginas)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    Siguiente →
+  </button>
+
+</div>
           </div>
         </div>
 
