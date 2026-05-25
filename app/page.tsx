@@ -62,6 +62,14 @@ const [fechaActual, setFechaActual] = useState(new Date());
   const [medioCaptacion, setMedioCaptacion] = useState("");
   const [candidatos, setCandidatos]       = useState<any[]>([]);
 
+  // =====================================================
+// PAGINACIÓN CANDIDATOS
+// =====================================================
+
+const [paginaCandidatos, setPaginaCandidatos] = useState(1);
+
+const candidatosPorPagina = 4;
+
   // STATES VACANTES
   const [vacanteNueva, setVacanteNueva]       = useState("");
   const [clienteVacante, setClienteVacante]   = useState("");
@@ -590,6 +598,26 @@ const resumenVacantes = Object.values(
 
   }, {})
 
+);
+
+// =====================================================
+// CANDIDATOS PAGINADOS
+// =====================================================
+
+const indiceInicialCandidatos =
+  (paginaCandidatos - 1) * candidatosPorPagina;
+
+const indiceFinalCandidatos =
+  indiceInicialCandidatos + candidatosPorPagina;
+
+const candidatosPaginados =
+  candidatos.slice(
+    indiceInicialCandidatos,
+    indiceFinalCandidatos
+  );
+
+const totalPaginasCandidatos = Math.ceil(
+  candidatos.length / candidatosPorPagina
 );
 
   const candidatosFecha = fechaSeleccionada
@@ -1126,7 +1154,7 @@ const resumenVacantes = Object.values(
                 </tr>
               </thead>
               <tbody>
-                {candidatos.map((c) => (
+                {candidatosPaginados.map((c) => (
                   <tr key={c.id} className="border-b">
                     <td className="p-4">{c.nombre}</td>
                     <td className="p-4">{c.vacante}</td>
@@ -1170,6 +1198,35 @@ const resumenVacantes = Object.values(
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-center items-center gap-4 mt-6">
+
+  <button
+    onClick={() =>
+      setPaginaCandidatos((prev) =>
+        Math.max(prev - 1, 1)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    ← Anterior
+  </button>
+
+  <span className="font-semibold">
+    Página {paginaCandidatos} de {totalPaginasCandidatos}
+  </span>
+
+  <button
+    onClick={() =>
+      setPaginaCandidatos((prev) =>
+        Math.min(prev + 1, totalPaginasCandidatos)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    Siguiente →
+  </button>
+
+</div>
           </div>
         </div>
 
