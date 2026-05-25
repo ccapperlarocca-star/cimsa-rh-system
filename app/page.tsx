@@ -22,81 +22,81 @@ import {
 // =====================================================
 
 const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
-  { vacante: "MECÁNICO",                cliente: "OPERACIONES" },
-  { vacante: "SOLDADOR",                cliente: "OPERACIONES" },
-  { vacante: "ELÉCTRICO",               cliente: "OPERACIONES" },
-  { vacante: "ELECTROMECÁNICO",         cliente: "OPERACIONES" },
-  { vacante: "AYUDANTE GENERAL",        cliente: "OPERACIONES" },
-  { vacante: "AYUDANTE LARGOS NORTE",   cliente: "OPERACIONES" },
-  { vacante: "AYUDANTE FERROPAK",       cliente: "OPERACIONES" },
-  { vacante: "CORTADOR",                cliente: "OPERACIONES" },
+  { vacante: "MECÁNICO", cliente: "OPERACIONES" },
+  { vacante: "SOLDADOR", cliente: "OPERACIONES" },
+  { vacante: "ELÉCTRICO", cliente: "OPERACIONES" },
+  { vacante: "ELECTROMECÁNICO", cliente: "OPERACIONES" },
+  { vacante: "AYUDANTE GENERAL", cliente: "OPERACIONES" },
+  { vacante: "AYUDANTE LARGOS NORTE", cliente: "OPERACIONES" },
+  { vacante: "AYUDANTE FERROPAK", cliente: "OPERACIONES" },
+  { vacante: "CORTADOR", cliente: "OPERACIONES" },
   { vacante: "SUPERVISOR DE SEGURIDAD", cliente: "HISE" },
-  { vacante: "AUXILIAR ADMIN HISE",     cliente: "HISE" },
-  { vacante: "CHOFER",                  cliente: "PROGRAMACIÓN" },
-  { vacante: "ALMACENISTA",             cliente: "ALMACÉN CIMSA" },
-  { vacante: "AUXILIAR DE COMPRAS",     cliente: "ALMACÉN CIMSA" },
-  { vacante: "CODIFICADOR",             cliente: "HUGO CASADOS" },
-  { vacante: "GESTIÓN",                 cliente: "HUGO CASADOS" },
-  { vacante: "PROGRAMADOR TERNIUM",     cliente: "HUGO CASADOS" },
-  { vacante: "MONTACARGUISTA",          cliente: "HUGO CASADOS" },
-  { vacante: "ALMACENISTA TERNIUM",     cliente: "HUGO CASADOS" },
-  { vacante: "INSPECTOR",               cliente: "HUGO CASADOS" },
-  { vacante: "SEGURIDAD TERNIUM",       cliente: "HUGO CASADOS" },
+  { vacante: "AUXILIAR ADMIN HISE", cliente: "HISE" },
+  { vacante: "CHOFER", cliente: "PROGRAMACIÓN" },
+  { vacante: "ALMACENISTA", cliente: "ALMACÉN CIMSA" },
+  { vacante: "AUXILIAR DE COMPRAS", cliente: "ALMACÉN CIMSA" },
+  { vacante: "CODIFICADOR", cliente: "HUGO CASADOS" },
+  { vacante: "GESTIÓN", cliente: "HUGO CASADOS" },
+  { vacante: "PROGRAMADOR TERNIUM", cliente: "HUGO CASADOS" },
+  { vacante: "MONTACARGUISTA", cliente: "HUGO CASADOS" },
+  { vacante: "ALMACENISTA TERNIUM", cliente: "HUGO CASADOS" },
+  { vacante: "INSPECTOR", cliente: "HUGO CASADOS" },
+  { vacante: "SEGURIDAD TERNIUM", cliente: "HUGO CASADOS" },
 ];
 
 export default function Home() {
 
   // =====================================================
-// FECHA Y HORA ACTUAL
-// =====================================================
+  // FECHA Y HORA ACTUAL
+  // =====================================================
 
-const [fechaActual, setFechaActual] = useState(new Date());
+  const [fechaActual, setFechaActual] = useState(new Date());
 
   // STATES CANDIDATOS
-  const [nombre, setNombre]               = useState("");
-  const [telefono, setTelefono]           = useState("");
-  const [vacante, setVacante]             = useState("");
-  const [vacanteId, setVacanteId]         = useState("");
-  const [cliente, setCliente]             = useState("");
-  const [localidad, setLocalidad]         = useState("");
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [vacante, setVacante] = useState("");
+  const [vacanteId, setVacanteId] = useState("");
+  const [cliente, setCliente] = useState("");
+  const [localidad, setLocalidad] = useState("");
   const [medioCaptacion, setMedioCaptacion] = useState("");
-  const [candidatos, setCandidatos]       = useState<any[]>([]);
+  const [candidatos, setCandidatos] = useState<any[]>([]);
 
   // =====================================================
-// PAGINACIÓN CANDIDATOS
-// =====================================================
+  // PAGINACIÓN CANDIDATOS
+  // =====================================================
 
-const [paginaCandidatos, setPaginaCandidatos] = useState(1);
+  const [paginaCandidatos, setPaginaCandidatos] = useState(1);
 
-const candidatosPorPagina = 4;
+  const candidatosPorPagina = 4;
 
   // STATES VACANTES
-  const [vacanteNueva, setVacanteNueva]       = useState("");
-  const [clienteVacante, setClienteVacante]   = useState("");
-  const [solicitados, setSolicitados]         = useState("");
-  const [vacantes, setVacantes]               = useState<any[]>([]);
+  const [vacanteNueva, setVacanteNueva] = useState("");
+  const [clienteVacante, setClienteVacante] = useState("");
+  const [solicitados, setSolicitados] = useState("");
+  const [vacantes, setVacantes] = useState<any[]>([]);
 
   // =====================================================
-// PAGINACIÓN VACANTES
-// =====================================================
+  // PAGINACIÓN VACANTES
+  // =====================================================
 
-const [paginaVacantes, setPaginaVacantes] = useState(1);
+  const [paginaVacantes, setPaginaVacantes] = useState(1);
 
-const vacantesPorPagina = 4;
+  const vacantesPorPagina = 4;
 
   // =====================================================
-// REASIGNACIÓN
-// =====================================================
+  // REASIGNACIÓN
+  // =====================================================
 
-const [mostrarReasignacion, setMostrarReasignacion] = useState(false);
+  const [mostrarReasignacion, setMostrarReasignacion] = useState(false);
 
-const [candidatoPendiente, setCandidatoPendiente] = useState<any>(null);
+  const [candidatoPendiente, setCandidatoPendiente] = useState<any>(null);
 
-const [nuevaVacanteId, setNuevaVacanteId] = useState("");
+  const [nuevaVacanteId, setNuevaVacanteId] = useState("");
 
   // CALENDARIO
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
-  const [offsetSemana, setOffsetSemana]           = useState(0);
+  const [offsetSemana, setOffsetSemana] = useState(0);
 
   useEffect(() => {
     setFechaSeleccionada(new Date());
@@ -192,215 +192,215 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
   // =====================================================
 
   const actualizarContratado = async (
-  candidato: any
-) => {
-  const reasignarCandidato = async () => {
+    candidato: any
+  ) => {
+    const reasignarCandidato = async () => {
 
-  if (!candidatoPendiente || !nuevaVacanteId) {
-    alert("Selecciona una vacante");
-    return;
-  }
+      if (!candidatoPendiente || !nuevaVacanteId) {
+        alert("Selecciona una vacante");
+        return;
+      }
 
-  // =========================================
-  // OBTENER NUEVA VACANTE
-  // =========================================
+      // =========================================
+      // OBTENER NUEVA VACANTE
+      // =========================================
 
-  const nuevaVacante = vacantes.find(
-    (v) => v.id === nuevaVacanteId
-  );
+      const nuevaVacante = vacantes.find(
+        (v) => v.id === nuevaVacanteId
+      );
 
-  if (!nuevaVacante) return;
+      if (!nuevaVacante) return;
 
-  // =========================================
-  // ACTUALIZAR CANDIDATO
-  // =========================================
+      // =========================================
+      // ACTUALIZAR CANDIDATO
+      // =========================================
 
-  const { error } = await supabase
-    .from("candidatos")
-    .update({
-      vacante: nuevaVacante.nombre,
-      vacante_id: nuevaVacante.id,
-      cliente: nuevaVacante.cliente,
-      contratado: true
-    })
-    .eq("id", candidatoPendiente.id);
+      const { error } = await supabase
+        .from("candidatos")
+        .update({
+          vacante: nuevaVacante.nombre,
+          vacante_id: nuevaVacante.id,
+          cliente: nuevaVacante.cliente,
+          contratado: true
+        })
+        .eq("id", candidatoPendiente.id);
 
-  if (error) {
-    console.log(error);
-    return;
-  }
+      if (error) {
+        console.log(error);
+        return;
+      }
 
-  // =========================================
-  // RECALCULAR NUEVA VACANTE
-  // =========================================
+      // =========================================
+      // RECALCULAR NUEVA VACANTE
+      // =========================================
 
-  const { data: contratadosData } = await supabase
-    .from("candidatos")
-    .select("id")
-    .eq("vacante_id", nuevaVacante.id)
-    .eq("contratado", true);
+      const { data: contratadosData } = await supabase
+        .from("candidatos")
+        .select("id")
+        .eq("vacante_id", nuevaVacante.id)
+        .eq("contratado", true);
 
-  const cubiertosReales = contratadosData?.length || 0;
+      const cubiertosReales = contratadosData?.length || 0;
 
-  const nuevoEstatus =
-    cubiertosReales >= nuevaVacante.solicitados
-      ? "Cubierta"
-      : "Abierta";
+      const nuevoEstatus =
+        cubiertosReales >= nuevaVacante.solicitados
+          ? "Cubierta"
+          : "Abierta";
       let fechaCobertura = null;
-let diasCobertura = null;
+      let diasCobertura = null;
 
-if (nuevoEstatus === "Cubierta") {
+      if (nuevoEstatus === "Cubierta") {
 
-  fechaCobertura = new Date();
+        fechaCobertura = new Date();
 
-  const fechaInicio = new Date(vacanteData.created_at);
+        const fechaInicio = new Date(vacanteData.created_at);
 
-  const diferenciaMs =
-    fechaCobertura.getTime() - fechaInicio.getTime();
+        const diferenciaMs =
+          fechaCobertura.getTime() - fechaInicio.getTime();
 
-  diasCobertura = Math.ceil(
-    diferenciaMs / (1000 * 60 * 60 * 24)
-  );
-}
+        diasCobertura = Math.ceil(
+          diferenciaMs / (1000 * 60 * 60 * 24)
+        );
+      }
 
-  // =========================================
-  // ACTUALIZAR VACANTE
-  // =========================================
+      // =========================================
+      // ACTUALIZAR VACANTE
+      // =========================================
 
- await supabase
-  .from("vacantes")
-  .update({
-    cubiertos: cubiertosReales,
-    estatus: nuevoEstatus,
-    fecha_cobertura: fechaCobertura,
-    dias_cobertura: diasCobertura
-  })
-    .eq("id", nuevaVacante.id);
+      await supabase
+        .from("vacantes")
+        .update({
+          cubiertos: cubiertosReales,
+          estatus: nuevoEstatus,
+          fecha_cobertura: fechaCobertura,
+          dias_cobertura: diasCobertura
+        })
+        .eq("id", nuevaVacante.id);
 
-  // =========================================
-  // LIMPIAR
-  // =========================================
+      // =========================================
+      // LIMPIAR
+      // =========================================
 
-  setMostrarReasignacion(false);
+      setMostrarReasignacion(false);
 
-  setCandidatoPendiente(null);
+      setCandidatoPendiente(null);
 
-  setNuevaVacanteId("");
+      setNuevaVacanteId("");
 
-  obtenerVacantes();
+      obtenerVacantes();
 
-  obtenerCandidatos();
-};
+      obtenerCandidatos();
+    };
 
-  const vId = candidato.vacante_id;
+    const vId = candidato.vacante_id;
 
-  // =========================================
-  // OBTENER VACANTE
-  // =========================================
+    // =========================================
+    // OBTENER VACANTE
+    // =========================================
 
-  const { data: vacanteData, error: vacanteError } = await supabase
-    .from("vacantes")
-    .select("*")
-    .eq("id", vId)
-    .single();
+    const { data: vacanteData, error: vacanteError } = await supabase
+      .from("vacantes")
+      .select("*")
+      .eq("id", vId)
+      .single();
 
-  if (vacanteError || !vacanteData) {
-    console.log(vacanteError);
-    return;
-  }
+    if (vacanteError || !vacanteData) {
+      console.log(vacanteError);
+      return;
+    }
 
-  // =========================================
-  // VALIDAR SI YA ESTÁ CUBIERTA
-  // =========================================
+    // =========================================
+    // VALIDAR SI YA ESTÁ CUBIERTA
+    // =========================================
 
-  if (
-    vacanteData.cubiertos >= vacanteData.solicitados &&
-    !candidato.contratado
-  ) {
+    if (
+      vacanteData.cubiertos >= vacanteData.solicitados &&
+      !candidato.contratado
+    ) {
 
-    alert("La vacante ya fue cubierta. Debes reasignar el candidato.");
+      alert("La vacante ya fue cubierta. Debes reasignar el candidato.");
 
-    setCandidatoPendiente(candidato);
+      setCandidatoPendiente(candidato);
 
-    setMostrarReasignacion(true);
+      setMostrarReasignacion(true);
 
-    return;
-  }
+      return;
+    }
 
-  // =========================================
-  // CAMBIAR ESTATUS CONTRATADO
-  // =========================================
+    // =========================================
+    // CAMBIAR ESTATUS CONTRATADO
+    // =========================================
 
-  const nuevoEstado = !candidato.contratado;
+    const nuevoEstado = !candidato.contratado;
 
-  const { error } = await supabase
-    .from("candidatos")
-    .update({
-      contratado: nuevoEstado
-    })
-    .eq("id", candidato.id);
+    const { error } = await supabase
+      .from("candidatos")
+      .update({
+        contratado: nuevoEstado
+      })
+      .eq("id", candidato.id);
 
-  if (error) {
-    console.log(error);
-    return;
-  }
+    if (error) {
+      console.log(error);
+      return;
+    }
 
-  // =========================================
-  // RECALCULAR CUBIERTOS
-  // =========================================
+    // =========================================
+    // RECALCULAR CUBIERTOS
+    // =========================================
 
-  const { data: contratadosData } = await supabase
-    .from("candidatos")
-    .select("id")
-    .eq("vacante_id", vId)
-    .eq("contratado", true);
+    const { data: contratadosData } = await supabase
+      .from("candidatos")
+      .select("id")
+      .eq("vacante_id", vId)
+      .eq("contratado", true);
 
-  const cubiertosReales = contratadosData?.length || 0;
+    const cubiertosReales = contratadosData?.length || 0;
 
-  // =========================================
-  // NUEVO ESTATUS
-  // =========================================
+    // =========================================
+    // NUEVO ESTATUS
+    // =========================================
 
-  const nuevoEstatus =
-    cubiertosReales >= vacanteData.solicitados
-      ? "Cubierta"
-      : "Abierta";
-      let fechaCobertura = null;
-let diasCobertura = null;
+    const nuevoEstatus =
+      cubiertosReales >= vacanteData.solicitados
+        ? "Cubierta"
+        : "Abierta";
+    let fechaCobertura = null;
+    let diasCobertura = null;
 
-if (nuevoEstatus === "Cubierta") {
+    if (nuevoEstatus === "Cubierta") {
 
-  fechaCobertura = new Date();
+      fechaCobertura = new Date();
 
-  const fechaInicio = new Date(vacanteData.created_at);
+      const fechaInicio = new Date(vacanteData.created_at);
 
-  const diferenciaMs =
-    fechaCobertura.getTime() - fechaInicio.getTime();
+      const diferenciaMs =
+        fechaCobertura.getTime() - fechaInicio.getTime();
 
-  diasCobertura = Math.ceil(
-    diferenciaMs / (1000 * 60 * 60 * 24)
-  );
-}
+      diasCobertura = Math.ceil(
+        diferenciaMs / (1000 * 60 * 60 * 24)
+      );
+    }
 
-  // =========================================
-  // ACTUALIZAR VACANTE
-  // =========================================
+    // =========================================
+    // ACTUALIZAR VACANTE
+    // =========================================
 
- await supabase
-  .from("vacantes")
-  .update({
-    cubiertos: cubiertosReales,
-    estatus: nuevoEstatus,
-    fecha_cobertura: fechaCobertura,
-    dias_cobertura: diasCobertura
-  })
+    await supabase
+      .from("vacantes")
+      .update({
+        cubiertos: cubiertosReales,
+        estatus: nuevoEstatus,
+        fecha_cobertura: fechaCobertura,
+        dias_cobertura: diasCobertura
+      })
 
-    .eq("id", vId);
+      .eq("id", vId);
 
-  obtenerVacantes();
+    obtenerVacantes();
 
-  obtenerCandidatos();
-};
+    obtenerCandidatos();
+  };
 
   // =====================================================
   // ACTUALIZAR ESTATUS VACANTE (manual)
@@ -419,106 +419,106 @@ if (nuevoEstatus === "Cubierta") {
 
   const reasignarCandidato = async () => {
 
-  if (!candidatoPendiente || !nuevaVacanteId) {
-    alert("Selecciona una vacante");
-    return;
-  }
+    if (!candidatoPendiente || !nuevaVacanteId) {
+      alert("Selecciona una vacante");
+      return;
+    }
 
-  // =========================================
-  // OBTENER NUEVA VACANTE
-  // =========================================
+    // =========================================
+    // OBTENER NUEVA VACANTE
+    // =========================================
 
-  const nuevaVacante = vacantes.find(
-    (v) => v.id === nuevaVacanteId
-  );
+    const nuevaVacante = vacantes.find(
+      (v) => v.id === nuevaVacanteId
+    );
 
-  if (!nuevaVacante) return;
+    if (!nuevaVacante) return;
 
-  // =========================================
-  // ACTUALIZAR CANDIDATO
-  // =========================================
+    // =========================================
+    // ACTUALIZAR CANDIDATO
+    // =========================================
 
-  const { error } = await supabase
-    .from("candidatos")
-    .update({
-      vacante: nuevaVacante.nombre,
-      vacante_id: nuevaVacante.id,
-      cliente: nuevaVacante.cliente,
-      contratado: true
-    })
-    .eq("id", candidatoPendiente.id);
+    const { error } = await supabase
+      .from("candidatos")
+      .update({
+        vacante: nuevaVacante.nombre,
+        vacante_id: nuevaVacante.id,
+        cliente: nuevaVacante.cliente,
+        contratado: true
+      })
+      .eq("id", candidatoPendiente.id);
 
-  if (error) {
-    console.log(error);
-    return;
-  }
+    if (error) {
+      console.log(error);
+      return;
+    }
 
-  // =========================================
-  // RECALCULAR CUBIERTOS
-  // =========================================
+    // =========================================
+    // RECALCULAR CUBIERTOS
+    // =========================================
 
-  const { data: contratadosData } = await supabase
-    .from("candidatos")
-    .select("id")
-    .eq("vacante_id", nuevaVacante.id)
-    .eq("contratado", true);
+    const { data: contratadosData } = await supabase
+      .from("candidatos")
+      .select("id")
+      .eq("vacante_id", nuevaVacante.id)
+      .eq("contratado", true);
 
-  const cubiertosReales = contratadosData?.length || 0;
+    const cubiertosReales = contratadosData?.length || 0;
 
-  // =========================================
-  // NUEVO ESTATUS
-  // =========================================
+    // =========================================
+    // NUEVO ESTATUS
+    // =========================================
 
-  const nuevoEstatus =
-    cubiertosReales >= nuevaVacante.solicitados
-      ? "Cubierta"
-      : "Abierta";
-      let fechaCobertura = null;
-let diasCobertura = null;
+    const nuevoEstatus =
+      cubiertosReales >= nuevaVacante.solicitados
+        ? "Cubierta"
+        : "Abierta";
+    let fechaCobertura = null;
+    let diasCobertura = null;
 
-if (nuevoEstatus === "Cubierta") {
+    if (nuevoEstatus === "Cubierta") {
 
-  fechaCobertura = new Date();
+      fechaCobertura = new Date();
 
-  const fechaInicio = new Date(nuevaVacante.created_at);
+      const fechaInicio = new Date(nuevaVacante.created_at);
 
-  const diferenciaMs =
-    fechaCobertura.getTime() - fechaInicio.getTime();
+      const diferenciaMs =
+        fechaCobertura.getTime() - fechaInicio.getTime();
 
-  diasCobertura = Math.ceil(
-    diferenciaMs / (1000 * 60 * 60 * 24)
-  );
-}
+      diasCobertura = Math.ceil(
+        diferenciaMs / (1000 * 60 * 60 * 24)
+      );
+    }
 
-  // =========================================
-  // ACTUALIZAR VACANTE
-  // =========================================
+    // =========================================
+    // ACTUALIZAR VACANTE
+    // =========================================
 
- await supabase
-  .from("vacantes")
-  .update({
-    cubiertos: cubiertosReales,
-    estatus: nuevoEstatus,
-    fecha_cobertura: fechaCobertura,
-    dias_cobertura: diasCobertura
-  })
+    await supabase
+      .from("vacantes")
+      .update({
+        cubiertos: cubiertosReales,
+        estatus: nuevoEstatus,
+        fecha_cobertura: fechaCobertura,
+        dias_cobertura: diasCobertura
+      })
 
-    .eq("id", nuevaVacante.id);
+      .eq("id", nuevaVacante.id);
 
-  // =========================================
-  // LIMPIAR MODAL
-  // =========================================
+    // =========================================
+    // LIMPIAR MODAL
+    // =========================================
 
-  setMostrarReasignacion(false);
+    setMostrarReasignacion(false);
 
-  setCandidatoPendiente(null);
+    setCandidatoPendiente(null);
 
-  setNuevaVacanteId("");
+    setNuevaVacanteId("");
 
-  obtenerVacantes();
+    obtenerVacantes();
 
-  obtenerCandidatos();
-};
+    obtenerCandidatos();
+  };
 
   // =====================================================
   // ELIMINAR
@@ -542,115 +542,155 @@ if (nuevoEstatus === "Cubierta") {
   // KPIs
   // =====================================================
 
-  const acudieron   = candidatos.filter((c) => c.asistencia === "Acudió").length;
-  const faltaron    = candidatos.filter((c) => c.asistencia === "Faltó").length;
+  const acudieron = candidatos.filter((c) => c.asistencia === "Acudió").length;
+  const faltaron = candidatos.filter((c) => c.asistencia === "Faltó").length;
   const reagendados = candidatos.filter((c) => c.asistencia === "Reagendado").length;
   const contratados = candidatos.filter((c) => c.contratado === true).length;
-  const conversion  = acudieron > 0 ? ((contratados / acudieron) * 100).toFixed(1) : "0";
+  const conversion = acudieron > 0 ? ((contratados / acudieron) * 100).toFixed(1) : "0";
 
-  const vacantesAbiertas  = vacantes.filter((v) => v.estatus === "Abierta").length;
-  const vacantesCubiertas = vacantes.filter((v) => v.estatus === "Cubierta").length;
+  // =====================================================
+  // KPIs CIMSA
+  // =====================================================
+
+  const vacantesCimsaAbiertas =
+    vacantes.filter(
+      (v) =>
+        v.cliente !== "HUGO CASADOS" &&
+        v.estatus === "Abierta"
+    ).length;
+
+  const vacantesCimsaCubiertas =
+    vacantes.filter(
+      (v) =>
+        v.cliente !== "HUGO CASADOS" &&
+        v.estatus === "Cubierta"
+    ).length;
+
+  // =====================================================
+  // KPIs TERNIUM
+  // =====================================================
+
+  const vacantesTerniumAbiertas =
+    vacantes.filter(
+      (v) =>
+        v.cliente === "HUGO CASADOS" &&
+        v.estatus === "Abierta"
+    ).length;
+
+  const vacantesTerniumCubiertas =
+    vacantes.filter(
+      (v) =>
+        v.cliente === "HUGO CASADOS" &&
+        v.estatus === "Cubierta"
+    ).length;
+
+  // =====================================================
+  // TOTAL
+  // =====================================================
+
+  const totalVacantes = vacantes.length;
+
   const vacantesDisponibles = vacantes.filter(
-  (v) => v.estatus === "Abierta" &&
-  v.cubiertos < v.solicitados
-);
-const indiceInicial =
-  (paginaVacantes - 1) * vacantesPorPagina;
+    (v) => v.estatus === "Abierta" &&
+      v.cubiertos < v.solicitados
+  );
+  const indiceInicial =
+    (paginaVacantes - 1) * vacantesPorPagina;
 
-const indiceFinal =
-  indiceInicial + vacantesPorPagina;
+  const indiceFinal =
+    indiceInicial + vacantesPorPagina;
 
-const vacantesPaginadas =
-  vacantes.slice(indiceInicial, indiceFinal);
+  const vacantesPaginadas =
+    vacantes.slice(indiceInicial, indiceFinal);
 
-const totalPaginas = Math.ceil(
-  vacantes.length / vacantesPorPagina
-);
-
-// =====================================================
-// RESUMEN POR TIPO DE VACANTE
-// =====================================================
-// =====================================================
-// PAGINACIÓN RESUMEN VACANTES
-// =====================================================
-
-const [paginaResumen, setPaginaResumen] = useState(1);
-
-const resumenPorPagina = 8;
-
-const resumenVacantes = Object.values(
-
-  vacantes.reduce((acc: any, vacante: any) => {
-
-    if (!acc[vacante.nombre]) {
-
-      acc[vacante.nombre] = {
-        nombre: vacante.nombre,
-        abiertas: 0,
-        cubiertas: 0,
-        total: 0,
-      };
-
-    }
-
-    acc[vacante.nombre].total++;
-
-    if (vacante.estatus === "Cubierta") {
-      acc[vacante.nombre].cubiertas++;
-    } else {
-      acc[vacante.nombre].abiertas++;
-    }
-
-    return acc;
-
-  }, {})
-
-);
-
-// =====================================================
-// RESUMEN PAGINADO
-// =====================================================
-
-const indiceInicialResumen =
-  (paginaResumen - 1) * resumenPorPagina;
-
-const indiceFinalResumen =
-  indiceInicialResumen + resumenPorPagina;
-
-const resumenPaginado =
-  resumenVacantes.slice(
-    indiceInicialResumen,
-    indiceFinalResumen
+  const totalPaginas = Math.ceil(
+    vacantes.length / vacantesPorPagina
   );
 
-const totalPaginasResumen = Math.ceil(
-  resumenVacantes.length / resumenPorPagina
-);
+  // =====================================================
+  // RESUMEN POR TIPO DE VACANTE
+  // =====================================================
+  // =====================================================
+  // PAGINACIÓN RESUMEN VACANTES
+  // =====================================================
 
-// =====================================================
-// CANDIDATOS PAGINADOS
-// =====================================================
+  const [paginaResumen, setPaginaResumen] = useState(1);
 
-const indiceInicialCandidatos =
-  (paginaCandidatos - 1) * candidatosPorPagina;
+  const resumenPorPagina = 8;
 
-const indiceFinalCandidatos =
-  indiceInicialCandidatos + candidatosPorPagina;
+  const resumenVacantes = Object.values(
 
-const candidatosPaginados =
-  candidatos.slice(
-    indiceInicialCandidatos,
-    indiceFinalCandidatos
+    vacantes.reduce((acc: any, vacante: any) => {
+
+      if (!acc[vacante.nombre]) {
+
+        acc[vacante.nombre] = {
+          nombre: vacante.nombre,
+          abiertas: 0,
+          cubiertas: 0,
+          total: 0,
+        };
+
+      }
+
+      acc[vacante.nombre].total++;
+
+      if (vacante.estatus === "Cubierta") {
+        acc[vacante.nombre].cubiertas++;
+      } else {
+        acc[vacante.nombre].abiertas++;
+      }
+
+      return acc;
+
+    }, {})
+
   );
 
-const totalPaginasCandidatos = Math.ceil(
-  candidatos.length / candidatosPorPagina
-);
+  // =====================================================
+  // RESUMEN PAGINADO
+  // =====================================================
+
+  const indiceInicialResumen =
+    (paginaResumen - 1) * resumenPorPagina;
+
+  const indiceFinalResumen =
+    indiceInicialResumen + resumenPorPagina;
+
+  const resumenPaginado =
+    resumenVacantes.slice(
+      indiceInicialResumen,
+      indiceFinalResumen
+    );
+
+  const totalPaginasResumen = Math.ceil(
+    resumenVacantes.length / resumenPorPagina
+  );
+
+  // =====================================================
+  // CANDIDATOS PAGINADOS
+  // =====================================================
+
+  const indiceInicialCandidatos =
+    (paginaCandidatos - 1) * candidatosPorPagina;
+
+  const indiceFinalCandidatos =
+    indiceInicialCandidatos + candidatosPorPagina;
+
+  const candidatosPaginados =
+    candidatos.slice(
+      indiceInicialCandidatos,
+      indiceFinalCandidatos
+    );
+
+  const totalPaginasCandidatos = Math.ceil(
+    candidatos.length / candidatosPorPagina
+  );
 
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
-        new Date(c.created_at).toDateString() === fechaSeleccionada.toDateString()
-      )
+      new Date(c.created_at).toDateString() === fechaSeleccionada.toDateString()
+    )
     : [];
 
   // =====================================================
@@ -667,15 +707,15 @@ const totalPaginasCandidatos = Math.ceil(
     finSemana.setDate(inicioSemana.getDate() + 6);
     finSemana.setHours(23, 59, 59, 999);
 
-    return ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"].map((dia, index) => {
+    return ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((dia, index) => {
       const cs = candidatos.filter((c) => {
         const f = new Date(c.created_at);
         return f >= inicioSemana && f <= finSemana && f.getDay() === index;
       });
       return {
         dia,
-        acudieron:   cs.filter((c) => c.asistencia === "Acudió").length,
-        faltaron:    cs.filter((c) => c.asistencia === "Faltó").length,
+        acudieron: cs.filter((c) => c.asistencia === "Acudió").length,
+        faltaron: cs.filter((c) => c.asistencia === "Faltó").length,
         reagendados: cs.filter((c) => c.asistencia === "Reagendado").length,
         contratados: cs.filter((c) => c.contratado === true).length,
       };
@@ -688,37 +728,37 @@ const totalPaginasCandidatos = Math.ceil(
 
   useEffect(() => {
 
-  obtenerCandidatos();
-
-  obtenerVacantes();
-
-  // =========================================
-  // ACTUALIZAR FECHA/HORA
-  // =========================================
-
-  const reloj = setInterval(() => {
-    setFechaActual(new Date());
-  }, 1000);
-
-  // =========================================
-  // REFRESH DATOS
-  // =========================================
-
-  const interval = setInterval(() => {
     obtenerCandidatos();
+
     obtenerVacantes();
-  }, 30000);
 
-  // =========================================
-  // LIMPIAR INTERVALOS
-  // =========================================
+    // =========================================
+    // ACTUALIZAR FECHA/HORA
+    // =========================================
 
-  return () => {
-    clearInterval(interval);
-    clearInterval(reloj);
-  };
+    const reloj = setInterval(() => {
+      setFechaActual(new Date());
+    }, 1000);
 
-}, []);
+    // =========================================
+    // REFRESH DATOS
+    // =========================================
+
+    const interval = setInterval(() => {
+      obtenerCandidatos();
+      obtenerVacantes();
+    }, 30000);
+
+    // =========================================
+    // LIMPIAR INTERVALOS
+    // =========================================
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(reloj);
+    };
+
+  }, []);
 
   // =====================================================
   // RENDER
@@ -731,48 +771,48 @@ const totalPaginasCandidatos = Math.ceil(
         {/* HEADER */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
 
-  <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center">
 
-    {/* IZQUIERDA */}
-    <div>
-      <h1 className="text-5xl font-bold text-blue-900 mb-2">
-        CIMSA RH SYSTEM
-      </h1>
+            {/* IZQUIERDA */}
+            <div>
+              <h1 className="text-5xl font-bold text-blue-900 mb-2">
+                CIMSA RH SYSTEM
+              </h1>
 
-      <p className="text-gray-600 text-lg">
-        Sistema de Reclutamiento y Headcount
-      </p>
-    </div>
+              <p className="text-gray-600 text-lg">
+                Sistema de Reclutamiento y Headcount
+              </p>
+            </div>
 
-    {/* DERECHA */}
-    <div className="text-right">
+            {/* DERECHA */}
+            <div className="text-right">
 
-      <p className="text-gray-500 text-sm uppercase tracking-wide">
-        Fecha Actual
-      </p>
+              <p className="text-gray-500 text-sm uppercase tracking-wide">
+                Fecha Actual
+              </p>
 
-      <h2 className="text-2xl font-bold text-blue-900">
-        {fechaActual.toLocaleDateString("es-MX", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </h2>
+              <h2 className="text-2xl font-bold text-blue-900">
+                {fechaActual.toLocaleDateString("es-MX", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h2>
 
-      <p className="text-gray-600 text-lg mt-1">
-        {fechaActual.toLocaleTimeString("es-MX", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })}
-      </p>
+              <p className="text-gray-600 text-lg mt-1">
+                {fechaActual.toLocaleTimeString("es-MX", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </p>
 
-    </div>
+            </div>
 
-  </div>
+          </div>
 
-</div>
+        </div>
 
         {/* KPIs RH */}
         <div className="grid md:grid-cols-6 gap-4 mb-8">
@@ -807,19 +847,63 @@ const totalPaginasCandidatos = Math.ceil(
           <h2 className="text-2xl font-bold mb-6">Gestión de Vacantes</h2>
 
           {/* KPIs VACANTES */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <div className="grid md:grid-cols-5 gap-4 mb-8">
+
+            {/* CIMSA ABIERTAS */}
             <div className="bg-blue-900 text-white p-6 rounded-xl">
-              <h3>Vacantes Abiertas</h3>
-              <p className="text-4xl font-bold">{vacantesAbiertas}</p>
+
+              <h3>Vacantes CIMSA Abiertas</h3>
+
+              <p className="text-4xl font-bold">
+                {vacantesCimsaAbiertas}
+              </p>
+
             </div>
+
+            {/* CIMSA CUBIERTAS */}
             <div className="bg-green-600 text-white p-6 rounded-xl">
-              <h3>Vacantes Cubiertas</h3>
-              <p className="text-4xl font-bold">{vacantesCubiertas}</p>
+
+              <h3>Vacantes CIMSA Cubiertas</h3>
+
+              <p className="text-4xl font-bold">
+                {vacantesCimsaCubiertas}
+              </p>
+
             </div>
+
+            {/* TERNIUM ABIERTAS */}
+            <div className="bg-yellow-500 text-white p-6 rounded-xl">
+
+              <h3>Vacantes Ternium Abiertas</h3>
+
+              <p className="text-4xl font-bold">
+                {vacantesTerniumAbiertas}
+              </p>
+
+            </div>
+
+            {/* TERNIUM CUBIERTAS */}
+            <div className="bg-purple-600 text-white p-6 rounded-xl">
+
+              <h3>Vacantes Ternium Cubiertas</h3>
+
+              <p className="text-4xl font-bold">
+                {vacantesTerniumCubiertas}
+              </p>
+
+            </div>
+
+            {/* TOTAL */}
             <div className="bg-black text-white p-6 rounded-xl">
+
               <h3>Total Vacantes</h3>
-              <p className="text-4xl font-bold">{vacantes.length}</p>
+
+              <p className="text-4xl font-bold">
+                {totalVacantes}
+              </p>
+
             </div>
+
           </div>
 
           {/* FORM NUEVA VACANTE — usa catálogo, auto-llena cliente */}
@@ -862,90 +946,89 @@ const totalPaginasCandidatos = Math.ceil(
           >
             Guardar Vacante
           </button>
-{/* ========================================= */}
-{/* RESUMEN DE VACANTES */}
-{/* ========================================= */}
+          {/* ========================================= */}
+          {/* RESUMEN DE VACANTES */}
+          {/* ========================================= */}
 
-<div className="mb-8">
+          <div className="mb-8">
 
-  <h3 className="text-2xl font-bold mb-4">
-    Resumen de Vacantes
-  </h3>
+            <h3 className="text-2xl font-bold mb-4">
+              Resumen de Vacantes
+            </h3>
 
-  <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-4 gap-4">
 
-    {resumenPaginado.map((r: any) => (
+              {resumenPaginado.map((r: any) => (
 
-      <div
-        key={r.nombre}
-        className="bg-gray-100 border rounded-2xl p-5 shadow-sm"
-      >
+                <div
+                  key={r.nombre}
+                  className="bg-gray-100 border rounded-2xl p-5 shadow-sm"
+                >
 
-        <h4 className="text-xl font-bold text-blue-900 mb-3">
-          {r.nombre}
-        </h4>
+                  <h4 className="text-xl font-bold text-blue-900 mb-3">
+                    {r.nombre}
+                  </h4>
 
-        <div className="space-y-1">
+                  <div className="space-y-1">
 
-          <p>
-            <span className="font-semibold text-blue-700">
-              Abiertas:
-            </span>{" "}
-            {r.abiertas}
-          </p>
+                    <p>
+                      <span className="font-semibold text-blue-700">
+                        Abiertas:
+                      </span>{" "}
+                      {r.abiertas}
+                    </p>
 
-          <p>
-            <span className="font-semibold text-green-700">
-              Cubiertas:
-            </span>{" "}
-            {r.cubiertas}
-          </p>
+                    <p>
+                      <span className="font-semibold text-green-700">
+                        Cubiertas:
+                      </span>{" "}
+                      {r.cubiertas}
+                    </p>
 
-          <p>
-            <span className="font-semibold text-gray-700">
-              Total:
-            </span>{" "}
-            {r.total}
-          </p>
+                    <p>
+                      <span className="font-semibold text-gray-700">
+                        Total:
+                      </span>{" "}
+                      {r.total}
+                    </p>
 
-        </div>
+                  </div>
 
-      </div>
+                </div>
+              ))}
 
-    ))}
+            </div>
+            <div className="flex justify-center items-center gap-4 mt-6">
 
-  </div>
-  <div className="flex justify-center items-center gap-4 mt-6">
+              <button
+                onClick={() =>
+                  setPaginaResumen((prev) =>
+                    Math.max(prev - 1, 1)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                ← Anterior
+              </button>
 
-  <button
-    onClick={() =>
-      setPaginaResumen((prev) =>
-        Math.max(prev - 1, 1)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    ← Anterior
-  </button>
+              <span className="font-semibold">
+                Página {paginaResumen} de {totalPaginasResumen}
+              </span>
 
-  <span className="font-semibold">
-    Página {paginaResumen} de {totalPaginasResumen}
-  </span>
+              <button
+                onClick={() =>
+                  setPaginaResumen((prev) =>
+                    Math.min(prev + 1, totalPaginasResumen)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                Siguiente →
+              </button>
 
-  <button
-    onClick={() =>
-      setPaginaResumen((prev) =>
-        Math.min(prev + 1, totalPaginasResumen)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    Siguiente →
-  </button>
+            </div>
 
-</div>
-
-</div>
+          </div>
           {/* TABLA VACANTES */}
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -973,37 +1056,35 @@ const totalPaginasCandidatos = Math.ceil(
                     <td className="p-4">{v.solicitados}</td>
                     <td className="p-4">{v.cubiertos}</td>
                     <td className="p-4">
-  {Math.max(v.solicitados - v.cubiertos, 0)}
-</td>
-<td className="p-4">
+                      {Math.max(v.solicitados - v.cubiertos, 0)}
+                    </td>
+                    <td className="p-4">
 
-  {v.estatus === "Cubierta"
-    ? `Cubierta en ${v.dias_cobertura || 0} días`
-    : `Abierta hace ${
-        Math.ceil(
-          (
-            new Date().getTime() -
-            new Date(v.created_at).getTime()
-          ) /
-          (1000 * 60 * 60 * 24)
-        )
-      } días`
-  }
+                      {v.estatus === "Cubierta"
+                        ? `Cubierta en ${v.dias_cobertura || 0} días`
+                        : `Abierta hace ${Math.ceil(
+                          (
+                            new Date().getTime() -
+                            new Date(v.created_at).getTime()
+                          ) /
+                          (1000 * 60 * 60 * 24)
+                        )
+                        } días`
+                      }
 
-</td>
+                    </td>
                     <td className="p-4">
                       <select
                         value={v.estatus}
                         onChange={(e) => actualizarEstatusVacante(v.id, e.target.value)}
-                        className={`px-3 py-2 rounded-lg text-white font-semibold border-0 cursor-pointer ${
-                          v.estatus === "Cubierta"
-  ? "bg-green-600"
-  : v.cubiertos > 0
-  ? "bg-yellow-500"
-  : "bg-blue-900"
-                        }`}
+                        className={`px-3 py-2 rounded-lg text-white font-semibold border-0 cursor-pointer ${v.estatus === "Cubierta"
+                          ? "bg-green-600"
+                          : v.cubiertos > 0
+                            ? "bg-yellow-500"
+                            : "bg-blue-900"
+                          }`}
                       >
-                        <option value="Abierta"  className="bg-white text-black">Abierta</option>
+                        <option value="Abierta" className="bg-white text-black">Abierta</option>
                         <option value="Cubierta" className="bg-white text-black">Cubierta</option>
                       </select>
                     </td>
@@ -1021,33 +1102,33 @@ const totalPaginasCandidatos = Math.ceil(
             </table>
             <div className="flex justify-center items-center gap-4 mt-6">
 
-  <button
-    onClick={() =>
-      setPaginaVacantes((prev) =>
-        Math.max(prev - 1, 1)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    ← Anterior
-  </button>
+              <button
+                onClick={() =>
+                  setPaginaVacantes((prev) =>
+                    Math.max(prev - 1, 1)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                ← Anterior
+              </button>
 
-  <span className="font-semibold">
-    Página {paginaVacantes} de {totalPaginas}
-  </span>
+              <span className="font-semibold">
+                Página {paginaVacantes} de {totalPaginas}
+              </span>
 
-  <button
-    onClick={() =>
-      setPaginaVacantes((prev) =>
-        Math.min(prev + 1, totalPaginas)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    Siguiente →
-  </button>
+              <button
+                onClick={() =>
+                  setPaginaVacantes((prev) =>
+                    Math.min(prev + 1, totalPaginas)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                Siguiente →
+              </button>
 
-</div>
+            </div>
           </div>
         </div>
 
@@ -1182,8 +1263,8 @@ const totalPaginasCandidatos = Math.ceil(
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="acudieron"   fill="#16a34a" />
-                <Bar dataKey="faltaron"    fill="#dc2626" />
+                <Bar dataKey="acudieron" fill="#16a34a" />
+                <Bar dataKey="faltaron" fill="#dc2626" />
                 <Bar dataKey="reagendados" fill="#eab308" />
                 <Bar dataKey="contratados" fill="#9333ea" />
               </BarChart>
@@ -1232,9 +1313,8 @@ const totalPaginasCandidatos = Math.ceil(
                     <td className="p-4">
                       <button
                         onClick={() => actualizarContratado(c)}
-                        className={`px-4 py-2 rounded-lg text-white ${
-                          c.contratado ? "bg-green-600" : "bg-gray-500"
-                        }`}
+                        className={`px-4 py-2 rounded-lg text-white ${c.contratado ? "bg-green-600" : "bg-gray-500"
+                          }`}
                       >
                         {c.contratado ? "Sí" : "No"}
                       </button>
@@ -1256,107 +1336,107 @@ const totalPaginasCandidatos = Math.ceil(
             </table>
             <div className="flex justify-center items-center gap-4 mt-6">
 
-  <button
-    onClick={() =>
-      setPaginaCandidatos((prev) =>
-        Math.max(prev - 1, 1)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    ← Anterior
-  </button>
+              <button
+                onClick={() =>
+                  setPaginaCandidatos((prev) =>
+                    Math.max(prev - 1, 1)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                ← Anterior
+              </button>
 
-  <span className="font-semibold">
-    Página {paginaCandidatos} de {totalPaginasCandidatos}
-  </span>
+              <span className="font-semibold">
+                Página {paginaCandidatos} de {totalPaginasCandidatos}
+              </span>
 
-  <button
-    onClick={() =>
-      setPaginaCandidatos((prev) =>
-        Math.min(prev + 1, totalPaginasCandidatos)
-      )
-    }
-    className="bg-gray-200 px-4 py-2 rounded-lg"
-  >
-    Siguiente →
-  </button>
+              <button
+                onClick={() =>
+                  setPaginaCandidatos((prev) =>
+                    Math.min(prev + 1, totalPaginasCandidatos)
+                  )
+                }
+                className="bg-gray-200 px-4 py-2 rounded-lg"
+              >
+                Siguiente →
+              </button>
 
-</div>
+            </div>
           </div>
         </div>
 
-      </div>
-      {/* ========================================= */}
-{/* MODAL REASIGNACIÓN */}
-{/* ========================================= */}
+        {/* ========================================= */}
+        {/* MODAL REASIGNACIÓN */}
+        {/* ========================================= */}
 
-{mostrarReasignacion && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        {mostrarReasignacion && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-    <div className="bg-white p-8 rounded-2xl w-full max-w-lg">
+            <div className="bg-white p-8 rounded-2xl w-full max-w-lg">
 
-      <h2 className="text-2xl font-bold mb-4">
-        Reasignar Candidato
-      </h2>
+              <h2 className="text-2xl font-bold mb-4">
+                Reasignar Candidato
+              </h2>
 
-      <p className="mb-2">
-        La vacante original ya fue cubierta.
-      </p>
+              <p className="mb-2">
+                La vacante original ya fue cubierta.
+              </p>
 
-      <p className="font-semibold mb-6">
-        {candidatoPendiente?.nombre}
-      </p>
+              <p className="font-semibold mb-6">
+                {candidatoPendiente?.nombre}
+              </p>
 
-      <select
-        value={nuevaVacanteId}
-        onChange={(e) => setNuevaVacanteId(e.target.value)}
-        className="w-full border p-4 rounded-xl mb-6"
-      >
+              <select
+                value={nuevaVacanteId}
+                onChange={(e) => setNuevaVacanteId(e.target.value)}
+                className="w-full border p-4 rounded-xl mb-6"
+              >
 
-        <option value="">
-          Selecciona nueva vacante
-        </option>
+                <option value="">
+                  Selecciona nueva vacante
+                </option>
 
-        {vacantesDisponibles.map((v) => (
+                {vacantesDisponibles.map((v) => (
 
-          <option key={v.id} value={v.id}>
+                  <option key={v.id} value={v.id}>
 
-            {v.nombre} — {v.cliente}
-            | Pendientes: {v.solicitados - v.cubiertos}
+                    {v.nombre} — {v.cliente}
+                    | Pendientes: {v.solicitados - v.cubiertos}
 
-          </option>
+                  </option>
 
-        ))}
+                ))}
 
-      </select>
+              </select>
 
-      <div className="flex gap-4">
+              <div className="flex gap-4">
 
-        <button
-          onClick={reasignarCandidato}
-          className="bg-green-600 text-white px-6 py-3 rounded-xl"
-        >
-          Reasignar y Contratar
-        </button>
+                <button
+                  onClick={reasignarCandidato}
+                  className="bg-green-600 text-white px-6 py-3 rounded-xl"
+                >
+                  Reasignar y Contratar
+                </button>
 
-        <button
-          onClick={() => {
-            setMostrarReasignacion(false);
-            setCandidatoPendiente(null);
-            setNuevaVacanteId("");
-          }}
-          className="bg-gray-300 px-6 py-3 rounded-xl"
-        >
-          Cancelar
-        </button>
+                <button
+                  onClick={() => {
+                    setMostrarReasignacion(false);
+                    setCandidatoPendiente(null);
+                    setNuevaVacanteId("");
+                  }}
+                  className="bg-gray-300 px-6 py-3 rounded-xl"
+                >
+                  Cancelar
+                </button>
 
-      </div>
+              </div>
 
-    </div>
+            </div>
 
-  </div>
-)}
+          </div>
+        )}
+              </div>
     </main>
   );
 }
