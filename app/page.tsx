@@ -451,6 +451,22 @@ if (nuevoEstatus === "Cubierta") {
     cubiertosReales >= nuevaVacante.solicitados
       ? "Cubierta"
       : "Abierta";
+      let fechaCobertura = null;
+let diasCobertura = null;
+
+if (nuevoEstatus === "Cubierta") {
+
+  fechaCobertura = new Date();
+
+  const fechaInicio = new Date(nuevaVacante.created_at);
+
+  const diferenciaMs =
+    fechaCobertura.getTime() - fechaInicio.getTime();
+
+  diasCobertura = Math.ceil(
+    diferenciaMs / (1000 * 60 * 60 * 24)
+  );
+}
 
   // =========================================
   // ACTUALIZAR VACANTE
