@@ -46,6 +46,12 @@ const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
 
 export default function Home() {
 
+  // =====================================================
+// FECHA Y HORA ACTUAL
+// =====================================================
+
+const [fechaActual, setFechaActual] = useState(new Date());
+
   // STATES CANDIDATOS
   const [nombre, setNombre]               = useState("");
   const [telefono, setTelefono]           = useState("");
@@ -593,14 +599,38 @@ const totalPaginas = Math.ceil(
   // =====================================================
 
   useEffect(() => {
+
+  obtenerCandidatos();
+
+  obtenerVacantes();
+
+  // =========================================
+  // ACTUALIZAR FECHA/HORA
+  // =========================================
+
+  const reloj = setInterval(() => {
+    setFechaActual(new Date());
+  }, 1000);
+
+  // =========================================
+  // REFRESH DATOS
+  // =========================================
+
+  const interval = setInterval(() => {
     obtenerCandidatos();
     obtenerVacantes();
-    const interval = setInterval(() => {
-      obtenerCandidatos();
-      obtenerVacantes();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  }, 30000);
+
+  // =========================================
+  // LIMPIAR INTERVALOS
+  // =========================================
+
+  return () => {
+    clearInterval(interval);
+    clearInterval(reloj);
+  };
+
+}, []);
 
   // =====================================================
   // RENDER
@@ -612,9 +642,49 @@ const totalPaginas = Math.ceil(
 
         {/* HEADER */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
-          <h1 className="text-5xl font-bold text-blue-900 mb-2">CIMSA RH SYSTEM</h1>
-          <p className="text-gray-600 text-lg">Sistema de Reclutamiento y Headcount</p>
-        </div>
+
+  <div className="flex justify-between items-center">
+
+    {/* IZQUIERDA */}
+    <div>
+      <h1 className="text-5xl font-bold text-blue-900 mb-2">
+        CIMSA RH SYSTEM
+      </h1>
+
+      <p className="text-gray-600 text-lg">
+        Sistema de Reclutamiento y Headcount
+      </p>
+    </div>
+
+    {/* DERECHA */}
+    <div className="text-right">
+
+      <p className="text-gray-500 text-sm uppercase tracking-wide">
+        Fecha Actual
+      </p>
+
+      <h2 className="text-2xl font-bold text-blue-900">
+        {fechaActual.toLocaleDateString("es-MX", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </h2>
+
+      <p className="text-gray-600 text-lg mt-1">
+        {fechaActual.toLocaleTimeString("es-MX", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
 
         {/* KPIs RH */}
         <div className="grid md:grid-cols-6 gap-4 mb-8">
