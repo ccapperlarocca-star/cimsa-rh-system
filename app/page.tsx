@@ -62,6 +62,16 @@ export default function Home() {
   const [solicitados, setSolicitados]         = useState("");
   const [vacantes, setVacantes]               = useState<any[]>([]);
 
+  // =====================================================
+// REASIGNACIÓN
+// =====================================================
+
+const [mostrarReasignacion, setMostrarReasignacion] = useState(false);
+
+const [candidatoPendiente, setCandidatoPendiente] = useState<any>(null);
+
+const [nuevaVacanteId, setNuevaVacanteId] = useState("");
+
   // CALENDARIO
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
   const [offsetSemana, setOffsetSemana]           = useState(0);
@@ -160,37 +170,178 @@ export default function Home() {
   // =====================================================
 
   const actualizarContratado = async (
-    id: string,
-    contratado: boolean,
-    vId: string,
-  ) => {
-    // 1. Actualizar candidato
-    const { error } = await supabase
-      .from("candidatos").update({ contratado }).eq("id", id);
-    if (error) { console.log(error); return; }
+  candidato: any
+) => {
+  const reasignarCandidato = async () => {
 
-    // 2. Contar contratados de esa vacante exacta por ID
-    const { data: contratadosData } = await supabase
-      .from("candidatos").select("id")
-      .eq("vacante_id", vId).eq("contratado", true);
-    const cubiertosReales = contratadosData?.length || 0;
+  if (!candidatoPendiente || !nuevaVacanteId) {
+    alert("Selecciona una vacante");
+    return;
+  }
 
-    // 3. Obtener vacante por ID
-    const { data: vacanteData } = await supabase
-      .from("vacantes").select("*").eq("id", vId).single();
-    if (!vacanteData) { obtenerVacantes(); obtenerCandidatos(); return; }
+  // =========================================
+  // OBTENER NUEVA VACANTE
+  // =========================================
 
-    // 4. Calcular estatus
-    const nuevoEstatus = cubiertosReales >= vacanteData.solicitados ? "Cubierta" : "Abierta";
+  const nuevaVacante = vacantes.find(
+    (v) => v.id === nuevaVacanteId
+  );
 
-    // 5. Actualizar vacante
-    await supabase.from("vacantes")
-      .update({ cubiertos: cubiertosReales, estatus: nuevoEstatus })
-      .eq("id", vId);
+  if (!nuevaVacante) return;
 
-    obtenerVacantes();
-    obtenerCandidatos();
-  };
+  // =========================================
+  // ACTUALIZAR CANDIDATO
+  // =========================================
+
+  const { error } = await supabase
+    .from("candidatos")
+    .update({
+      vacante: nuevaVacante.nombre,
+      vacante_id: nuevaVacante.id,
+      cliente: nuevaVacante.cliente,
+      contratado: true
+    })
+    .eq("id", candidatoPendiente.id);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  // =========================================
+  // RECALCULAR NUEVA VACANTE
+  // =========================================
+
+  const { data: contratadosData } = await supabase
+    .from("candidatos")
+    .select("id")
+    .eq("vacante_id", nuevaVacante.id)
+    .eq("contratado", true);
+
+  const cubiertosReales = contratadosData?.length || 0;
+
+  const nuevoEstatus =
+    cubiertosReales >= nuevaVacante.solicitados
+      ? "Cubierta"
+      : "Abierta";
+
+  // =========================================
+  // ACTUALIZAR VACANTE
+  // =========================================
+
+  await supabase
+    .from("vacantes")
+    .update({
+      cubiertos: cubiertosReales,
+      estatus: nuevoEstatus
+    })
+    .eq("id", nuevaVacante.id);
+
+  // =========================================
+  // LIMPIAR
+  // =========================================
+
+  setMostrarReasignacion(false);
+
+  setCandidatoPendiente(null);
+
+  setNuevaVacanteId("");
+
+  obtenerVacantes();
+
+  obtenerCandidatos();
+};
+
+  const vId = candidato.vacante_id;
+
+  // =========================================
+  // OBTENER VACANTE
+  // =========================================
+
+  const { data: vacanteData, error: vacanteError } = await supabase
+    .from("vacantes")
+    .select("*")
+    .eq("id", vId)
+    .single();
+
+  if (vacanteError || !vacanteData) {
+    console.log(vacanteError);
+    return;
+  }
+
+  // =========================================
+  // VALIDAR SI YA ESTÁ CUBIERTA
+  // =========================================
+
+  if (
+    vacanteData.cubiertos >= vacanteData.solicitados &&
+    !candidato.contratado
+  ) {
+
+    alert("La vacante ya fue cubierta. Debes reasignar el candidato.");
+
+    setCandidatoPendiente(candidato);
+
+    setMostrarReasignacion(true);
+
+    return;
+  }
+
+  // =========================================
+  // CAMBIAR ESTATUS CONTRATADO
+  // =========================================
+
+  const nuevoEstado = !candidato.contratado;
+
+  const { error } = await supabase
+    .from("candidatos")
+    .update({
+      contratado: nuevoEstado
+    })
+    .eq("id", candidato.id);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  // =========================================
+  // RECALCULAR CUBIERTOS
+  // =========================================
+
+  const { data: contratadosData } = await supabase
+    .from("candidatos")
+    .select("id")
+    .eq("vacante_id", vId)
+    .eq("contratado", true);
+
+  const cubiertosReales = contratadosData?.length || 0;
+
+  // =========================================
+  // NUEVO ESTATUS
+  // =========================================
+
+  const nuevoEstatus =
+    cubiertosReales >= vacanteData.solicitados
+      ? "Cubierta"
+      : "Abierta";
+
+  // =========================================
+  // ACTUALIZAR VACANTE
+  // =========================================
+
+  await supabase
+    .from("vacantes")
+    .update({
+      cubiertos: cubiertosReales,
+      estatus: nuevoEstatus
+    })
+    .eq("id", vId);
+
+  obtenerVacantes();
+
+  obtenerCandidatos();
+};
 
   // =====================================================
   // ACTUALIZAR ESTATUS VACANTE (manual)
@@ -206,6 +357,90 @@ export default function Home() {
     }
     obtenerVacantes();
   };
+
+  const reasignarCandidato = async () => {
+
+  if (!candidatoPendiente || !nuevaVacanteId) {
+    alert("Selecciona una vacante");
+    return;
+  }
+
+  // =========================================
+  // OBTENER NUEVA VACANTE
+  // =========================================
+
+  const nuevaVacante = vacantes.find(
+    (v) => v.id === nuevaVacanteId
+  );
+
+  if (!nuevaVacante) return;
+
+  // =========================================
+  // ACTUALIZAR CANDIDATO
+  // =========================================
+
+  const { error } = await supabase
+    .from("candidatos")
+    .update({
+      vacante: nuevaVacante.nombre,
+      vacante_id: nuevaVacante.id,
+      cliente: nuevaVacante.cliente,
+      contratado: true
+    })
+    .eq("id", candidatoPendiente.id);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  // =========================================
+  // RECALCULAR CUBIERTOS
+  // =========================================
+
+  const { data: contratadosData } = await supabase
+    .from("candidatos")
+    .select("id")
+    .eq("vacante_id", nuevaVacante.id)
+    .eq("contratado", true);
+
+  const cubiertosReales = contratadosData?.length || 0;
+
+  // =========================================
+  // NUEVO ESTATUS
+  // =========================================
+
+  const nuevoEstatus =
+    cubiertosReales >= nuevaVacante.solicitados
+      ? "Cubierta"
+      : "Abierta";
+
+  // =========================================
+  // ACTUALIZAR VACANTE
+  // =========================================
+
+  await supabase
+    .from("vacantes")
+    .update({
+      cubiertos: cubiertosReales,
+      estatus: nuevoEstatus
+    })
+    .eq("id", nuevaVacante.id);
+
+  // =========================================
+  // LIMPIAR MODAL
+  // =========================================
+
+  setMostrarReasignacion(false);
+
+  setCandidatoPendiente(null);
+
+  setNuevaVacanteId("");
+
+  obtenerVacantes();
+
+  obtenerCandidatos();
+};
 
   // =====================================================
   // ELIMINAR
@@ -237,6 +472,10 @@ export default function Home() {
 
   const vacantesAbiertas  = vacantes.filter((v) => v.estatus === "Abierta").length;
   const vacantesCubiertas = vacantes.filter((v) => v.estatus === "Cubierta").length;
+  const vacantesDisponibles = vacantes.filter(
+  (v) => v.estatus === "Abierta" &&
+  v.cubiertos < v.solicitados
+);
 
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
@@ -415,13 +654,19 @@ export default function Home() {
                     </td>
                     <td className="p-4">{v.solicitados}</td>
                     <td className="p-4">{v.cubiertos}</td>
-                    <td className="p-4">{v.solicitados - v.cubiertos}</td>
+                    <td className="p-4">
+  {Math.max(v.solicitados - v.cubiertos, 0)}
+</td>
                     <td className="p-4">
                       <select
                         value={v.estatus}
                         onChange={(e) => actualizarEstatusVacante(v.id, e.target.value)}
                         className={`px-3 py-2 rounded-lg text-white font-semibold border-0 cursor-pointer ${
-                          v.estatus === "Cubierta" ? "bg-green-600" : "bg-yellow-500"
+                          v.estatus === "Cubierta"
+  ? "bg-green-600"
+  : v.cubiertos > 0
+  ? "bg-yellow-500"
+  : "bg-blue-900"
                         }`}
                       >
                         <option value="Abierta"  className="bg-white text-black">Abierta</option>
@@ -460,7 +705,7 @@ export default function Home() {
               className="border p-4 rounded-xl"
             >
               <option value="">Selecciona Vacante</option>
-              {vacantes.map((v) => (
+              {vacantesDisponibles.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.nombre} — {v.cliente} ({new Date(v.created_at).toLocaleDateString("es-MX")})
                 </option>
@@ -623,7 +868,7 @@ export default function Home() {
                     </td>
                     <td className="p-4">
                       <button
-                        onClick={() => actualizarContratado(c.id, !c.contratado, c.vacante_id)}
+                        onClick={() => actualizarContratado(c)}
                         className={`px-4 py-2 rounded-lg text-white ${
                           c.contratado ? "bg-green-600" : "bg-gray-500"
                         }`}
@@ -650,6 +895,76 @@ export default function Home() {
         </div>
 
       </div>
+      {/* ========================================= */}
+{/* MODAL REASIGNACIÓN */}
+{/* ========================================= */}
+
+{mostrarReasignacion && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+    <div className="bg-white p-8 rounded-2xl w-full max-w-lg">
+
+      <h2 className="text-2xl font-bold mb-4">
+        Reasignar Candidato
+      </h2>
+
+      <p className="mb-2">
+        La vacante original ya fue cubierta.
+      </p>
+
+      <p className="font-semibold mb-6">
+        {candidatoPendiente?.nombre}
+      </p>
+
+      <select
+        value={nuevaVacanteId}
+        onChange={(e) => setNuevaVacanteId(e.target.value)}
+        className="w-full border p-4 rounded-xl mb-6"
+      >
+
+        <option value="">
+          Selecciona nueva vacante
+        </option>
+
+        {vacantesDisponibles.map((v) => (
+
+          <option key={v.id} value={v.id}>
+
+            {v.nombre} — {v.cliente}
+            | Pendientes: {v.solicitados - v.cubiertos}
+
+          </option>
+
+        ))}
+
+      </select>
+
+      <div className="flex gap-4">
+
+        <button
+          onClick={reasignarCandidato}
+          className="bg-green-600 text-white px-6 py-3 rounded-xl"
+        >
+          Reasignar y Contratar
+        </button>
+
+        <button
+          onClick={() => {
+            setMostrarReasignacion(false);
+            setCandidatoPendiente(null);
+            setNuevaVacanteId("");
+          }}
+          className="bg-gray-300 px-6 py-3 rounded-xl"
+        >
+          Cancelar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
     </main>
   );
 }
