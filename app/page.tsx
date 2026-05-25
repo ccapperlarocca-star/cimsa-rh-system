@@ -224,17 +224,35 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
     cubiertosReales >= nuevaVacante.solicitados
       ? "Cubierta"
       : "Abierta";
+      let fechaCobertura = null;
+let diasCobertura = null;
+
+if (nuevoEstatus === "Cubierta") {
+
+  fechaCobertura = new Date();
+
+  const fechaInicio = new Date(vacanteData.created_at);
+
+  const diferenciaMs =
+    fechaCobertura.getTime() - fechaInicio.getTime();
+
+  diasCobertura = Math.ceil(
+    diferenciaMs / (1000 * 60 * 60 * 24)
+  );
+}
 
   // =========================================
   // ACTUALIZAR VACANTE
   // =========================================
 
-  await supabase
-    .from("vacantes")
-    .update({
-      cubiertos: cubiertosReales,
-      estatus: nuevoEstatus
-    })
+ await supabase
+  .from("vacantes")
+  .update({
+    cubiertos: cubiertosReales,
+    estatus: nuevoEstatus,
+    fecha_cobertura: fechaCobertura,
+    dias_cobertura: diasCobertura
+  })
     .eq("id", nuevaVacante.id);
 
   // =========================================
@@ -325,17 +343,36 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
     cubiertosReales >= vacanteData.solicitados
       ? "Cubierta"
       : "Abierta";
+      let fechaCobertura = null;
+let diasCobertura = null;
+
+if (nuevoEstatus === "Cubierta") {
+
+  fechaCobertura = new Date();
+
+  const fechaInicio = new Date(vacanteData.created_at);
+
+  const diferenciaMs =
+    fechaCobertura.getTime() - fechaInicio.getTime();
+
+  diasCobertura = Math.ceil(
+    diferenciaMs / (1000 * 60 * 60 * 24)
+  );
+}
 
   // =========================================
   // ACTUALIZAR VACANTE
   // =========================================
 
-  await supabase
-    .from("vacantes")
-    .update({
-      cubiertos: cubiertosReales,
-      estatus: nuevoEstatus
-    })
+ await supabase
+  .from("vacantes")
+  .update({
+    cubiertos: cubiertosReales,
+    estatus: nuevoEstatus,
+    fecha_cobertura: fechaCobertura,
+    dias_cobertura: diasCobertura
+  })
+
     .eq("id", vId);
 
   obtenerVacantes();
@@ -419,12 +456,15 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
   // ACTUALIZAR VACANTE
   // =========================================
 
-  await supabase
-    .from("vacantes")
-    .update({
-      cubiertos: cubiertosReales,
-      estatus: nuevoEstatus
-    })
+ await supabase
+  .from("vacantes")
+  .update({
+    cubiertos: cubiertosReales,
+    estatus: nuevoEstatus,
+    fecha_cobertura: fechaCobertura,
+    dias_cobertura: diasCobertura
+  })
+
     .eq("id", nuevaVacante.id);
 
   // =========================================
@@ -640,6 +680,7 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
                   <th className="p-4 text-left">Solicitados</th>
                   <th className="p-4 text-left">Cubiertos</th>
                   <th className="p-4 text-left">Pendientes</th>
+                  <th className="p-4 text-left">Tiempo</th>
                   <th className="p-4 text-left">Estatus</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
@@ -656,6 +697,22 @@ const [nuevaVacanteId, setNuevaVacanteId] = useState("");
                     <td className="p-4">{v.cubiertos}</td>
                     <td className="p-4">
   {Math.max(v.solicitados - v.cubiertos, 0)}
+</td>
+<td className="p-4">
+
+  {v.estatus === "Cubierta"
+    ? `Cubierta en ${v.dias_cobertura || 0} días`
+    : `Abierta hace ${
+        Math.ceil(
+          (
+            new Date().getTime() -
+            new Date(v.created_at).getTime()
+          ) /
+          (1000 * 60 * 60 * 24)
+        )
+      } días`
+  }
+
 </td>
                     <td className="p-4">
                       <select
