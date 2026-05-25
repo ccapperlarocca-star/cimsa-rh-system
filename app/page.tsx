@@ -570,6 +570,13 @@ const totalPaginas = Math.ceil(
 // =====================================================
 // RESUMEN POR TIPO DE VACANTE
 // =====================================================
+// =====================================================
+// PAGINACIÓN RESUMEN VACANTES
+// =====================================================
+
+const [paginaResumen, setPaginaResumen] = useState(1);
+
+const resumenPorPagina = 8;
 
 const resumenVacantes = Object.values(
 
@@ -598,6 +605,26 @@ const resumenVacantes = Object.values(
 
   }, {})
 
+);
+
+// =====================================================
+// RESUMEN PAGINADO
+// =====================================================
+
+const indiceInicialResumen =
+  (paginaResumen - 1) * resumenPorPagina;
+
+const indiceFinalResumen =
+  indiceInicialResumen + resumenPorPagina;
+
+const resumenPaginado =
+  resumenVacantes.slice(
+    indiceInicialResumen,
+    indiceFinalResumen
+  );
+
+const totalPaginasResumen = Math.ceil(
+  resumenVacantes.length / resumenPorPagina
 );
 
 // =====================================================
@@ -847,7 +874,7 @@ const totalPaginasCandidatos = Math.ceil(
 
   <div className="grid md:grid-cols-4 gap-4">
 
-    {resumenVacantes.map((r: any) => (
+    {resumenPaginado.map((r: any) => (
 
       <div
         key={r.nombre}
@@ -888,6 +915,35 @@ const totalPaginasCandidatos = Math.ceil(
     ))}
 
   </div>
+  <div className="flex justify-center items-center gap-4 mt-6">
+
+  <button
+    onClick={() =>
+      setPaginaResumen((prev) =>
+        Math.max(prev - 1, 1)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    ← Anterior
+  </button>
+
+  <span className="font-semibold">
+    Página {paginaResumen} de {totalPaginasResumen}
+  </span>
+
+  <button
+    onClick={() =>
+      setPaginaResumen((prev) =>
+        Math.min(prev + 1, totalPaginasResumen)
+      )
+    }
+    className="bg-gray-200 px-4 py-2 rounded-lg"
+  >
+    Siguiente →
+  </button>
+
+</div>
 
 </div>
           {/* TABLA VACANTES */}
