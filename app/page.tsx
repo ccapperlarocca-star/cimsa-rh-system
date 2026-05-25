@@ -559,6 +559,39 @@ const totalPaginas = Math.ceil(
   vacantes.length / vacantesPorPagina
 );
 
+// =====================================================
+// RESUMEN POR TIPO DE VACANTE
+// =====================================================
+
+const resumenVacantes = Object.values(
+
+  vacantes.reduce((acc: any, vacante: any) => {
+
+    if (!acc[vacante.nombre]) {
+
+      acc[vacante.nombre] = {
+        nombre: vacante.nombre,
+        abiertas: 0,
+        cubiertas: 0,
+        total: 0,
+      };
+
+    }
+
+    acc[vacante.nombre].total++;
+
+    if (vacante.estatus === "Cubierta") {
+      acc[vacante.nombre].cubiertas++;
+    } else {
+      acc[vacante.nombre].abiertas++;
+    }
+
+    return acc;
+
+  }, {})
+
+);
+
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
         new Date(c.created_at).toDateString() === fechaSeleccionada.toDateString()
@@ -774,7 +807,61 @@ const totalPaginas = Math.ceil(
           >
             Guardar Vacante
           </button>
+{/* ========================================= */}
+{/* RESUMEN DE VACANTES */}
+{/* ========================================= */}
 
+<div className="mb-8">
+
+  <h3 className="text-2xl font-bold mb-4">
+    Resumen de Vacantes
+  </h3>
+
+  <div className="grid md:grid-cols-4 gap-4">
+
+    {resumenVacantes.map((r: any) => (
+
+      <div
+        key={r.nombre}
+        className="bg-gray-100 border rounded-2xl p-5 shadow-sm"
+      >
+
+        <h4 className="text-xl font-bold text-blue-900 mb-3">
+          {r.nombre}
+        </h4>
+
+        <div className="space-y-1">
+
+          <p>
+            <span className="font-semibold text-blue-700">
+              Abiertas:
+            </span>{" "}
+            {r.abiertas}
+          </p>
+
+          <p>
+            <span className="font-semibold text-green-700">
+              Cubiertas:
+            </span>{" "}
+            {r.cubiertas}
+          </p>
+
+          <p>
+            <span className="font-semibold text-gray-700">
+              Total:
+            </span>{" "}
+            {r.total}
+          </p>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
           {/* TABLA VACANTES */}
           <div className="overflow-x-auto">
             <table className="w-full">
