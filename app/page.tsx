@@ -541,13 +541,84 @@ export default function Home() {
   // =====================================================
   // KPIs
   // =====================================================
+// =====================================================
+// CANDIDATOS CIMSA
+// =====================================================
 
-  const acudieron = candidatos.filter((c) => c.asistencia === "Acudió").length;
-  const faltaron = candidatos.filter((c) => c.asistencia === "Faltó").length;
-  const reagendados = candidatos.filter((c) => c.asistencia === "Reagendado").length;
-  const contratados = candidatos.filter((c) => c.contratado === true).length;
-  const conversion = acudieron > 0 ? ((contratados / acudieron) * 100).toFixed(1) : "0";
+const candidatosCimsa =
+  candidatos.filter(
+    (c) => c.cliente !== "HUGO CASADOS"
+  );
 
+const citadosCimsa = candidatosCimsa.length;
+
+const acudieronCimsa =
+  candidatosCimsa.filter(
+    (c) => c.asistencia === "Acudió"
+  ).length;
+
+const faltaronCimsa =
+  candidatosCimsa.filter(
+    (c) => c.asistencia === "Faltó"
+  ).length;
+
+const reagendadosCimsa =
+  candidatosCimsa.filter(
+    (c) => c.asistencia === "Reagendado"
+  ).length;
+
+const contratadosCimsa =
+  candidatosCimsa.filter(
+    (c) => c.contratado === true
+  ).length;
+
+const conversionCimsa =
+  citadosCimsa > 0
+    ? (
+        (contratadosCimsa / citadosCimsa) *
+        100
+      ).toFixed(1)
+    : "0";
+
+// =====================================================
+// CANDIDATOS TERNIUM
+// =====================================================
+
+const candidatosTernium =
+  candidatos.filter(
+    (c) => c.cliente === "HUGO CASADOS"
+  );
+
+const citadosTernium = candidatosTernium.length;
+
+const acudieronTernium =
+  candidatosTernium.filter(
+    (c) => c.asistencia === "Acudió"
+  ).length;
+
+const faltaronTernium =
+  candidatosTernium.filter(
+    (c) => c.asistencia === "Faltó"
+  ).length;
+
+const reagendadosTernium =
+  candidatosTernium.filter(
+    (c) => c.asistencia === "Reagendado"
+  ).length;
+
+const contratadosTernium =
+  candidatosTernium.filter(
+    (c) => c.contratado === true
+  ).length;
+
+const conversionTernium =
+  citadosTernium > 0
+    ? (
+        (contratadosTernium / citadosTernium) *
+        100
+      ).toFixed(1)
+    : "0";
+    
   // =====================================================
   // KPIs CIMSA
   // =====================================================
@@ -814,33 +885,113 @@ export default function Home() {
 
         </div>
 
-        {/* KPIs RH */}
-        <div className="grid md:grid-cols-6 gap-4 mb-8">
-          <div className="bg-blue-900 text-white p-6 rounded-2xl shadow">
-            <h2>Citados</h2>
-            <p className="text-4xl font-bold">{candidatos.length}</p>
-          </div>
-          <div className="bg-green-600 text-white p-6 rounded-2xl shadow">
-            <h2>Acudieron</h2>
-            <p className="text-4xl font-bold">{acudieron}</p>
-          </div>
-          <div className="bg-red-600 text-white p-6 rounded-2xl shadow">
-            <h2>Faltaron</h2>
-            <p className="text-4xl font-bold">{faltaron}</p>
-          </div>
-          <div className="bg-yellow-500 text-white p-6 rounded-2xl shadow">
-            <h2>Reagendados</h2>
-            <p className="text-4xl font-bold">{reagendados}</p>
-          </div>
-          <div className="bg-purple-600 text-white p-6 rounded-2xl shadow">
-            <h2>Contratados</h2>
-            <p className="text-4xl font-bold">{contratados}</p>
-          </div>
-          <div className="bg-black text-white p-6 rounded-2xl shadow">
-            <h2>Conversión RH</h2>
-            <p className="text-4xl font-bold">{conversion}%</p>
-          </div>
-        </div>
+       
+{/* KPIs RH CIMSA */}
+{/* ===================================================== */}
+
+<h2 className="text-2xl font-bold mb-4">
+  RH CIMSA
+</h2>
+
+<div className="grid md:grid-cols-6 gap-4 mb-8">
+
+  <div className="bg-blue-900 text-white p-6 rounded-2xl shadow">
+    <h2>Citados</h2>
+    <p className="text-4xl font-bold">
+      {citadosCimsa}
+    </p>
+  </div>
+
+  <div className="bg-green-600 text-white p-6 rounded-2xl shadow">
+    <h2>Acudieron</h2>
+    <p className="text-4xl font-bold">
+      {acudieronCimsa}
+    </p>
+  </div>
+
+  <div className="bg-red-600 text-white p-6 rounded-2xl shadow">
+    <h2>Faltaron</h2>
+    <p className="text-4xl font-bold">
+      {faltaronCimsa}
+    </p>
+  </div>
+
+  <div className="bg-yellow-500 text-white p-6 rounded-2xl shadow">
+    <h2>Reagendados</h2>
+    <p className="text-4xl font-bold">
+      {reagendadosCimsa}
+    </p>
+  </div>
+
+  <div className="bg-purple-600 text-white p-6 rounded-2xl shadow">
+    <h2>Contratados</h2>
+    <p className="text-4xl font-bold">
+      {contratadosCimsa}
+    </p>
+  </div>
+
+  <div className="bg-black text-white p-6 rounded-2xl shadow">
+    <h2>Conversión RH</h2>
+    <p className="text-4xl font-bold">
+      {conversionCimsa}%
+    </p>
+  </div>
+
+</div>
+
+{/* ===================================================== */}
+{/* KPIs RH TERNIUM */}
+{/* ===================================================== */}
+
+<h2 className="text-2xl font-bold mb-4 mt-10">
+  RH TERNIUM
+</h2>
+
+<div className="grid md:grid-cols-6 gap-4 mb-8">
+
+  <div className="bg-blue-900 text-white p-6 rounded-2xl shadow">
+    <h2>Citados</h2>
+    <p className="text-4xl font-bold">
+      {citadosTernium}
+    </p>
+  </div>
+
+  <div className="bg-green-600 text-white p-6 rounded-2xl shadow">
+    <h2>Acudieron</h2>
+    <p className="text-4xl font-bold">
+      {acudieronTernium}
+    </p>
+  </div>
+
+  <div className="bg-red-600 text-white p-6 rounded-2xl shadow">
+    <h2>Faltaron</h2>
+    <p className="text-4xl font-bold">
+      {faltaronTernium}
+    </p>
+  </div>
+
+  <div className="bg-yellow-500 text-white p-6 rounded-2xl shadow">
+    <h2>Reagendados</h2>
+    <p className="text-4xl font-bold">
+      {reagendadosTernium}
+    </p>
+  </div>
+
+  <div className="bg-purple-600 text-white p-6 rounded-2xl shadow">
+    <h2>Contratados</h2>
+    <p className="text-4xl font-bold">
+      {contratadosTernium}
+    </p>
+  </div>
+
+  <div className="bg-black text-white p-6 rounded-2xl shadow">
+    <h2>Conversión RH</h2>
+    <p className="text-4xl font-bold">
+      {conversionTernium}%
+    </p>
+  </div>
+
+</div>
 
         {/* GESTIÓN VACANTES */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
