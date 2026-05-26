@@ -191,23 +191,28 @@ export default function Home() {
   // CONTRATADO + HEADCOUNT (por vacante_id)
   // =====================================================
 
-  const actualizarContratado = async (
-    candidato: any
-  ) => {
-  
-    const nuevoEstado = !candidato.contratado;
+ const actualizarContratado = async (
+  candidato: any
+) => {
 
-  const { error } = await supabase
-    .from("candidatos")
-    .update({
-      contratado: nuevoEstado,
+  const nuevoEstado = !candidato.contratado;
 
-      fecha_contratacion:
-        nuevoEstado
-          ? new Date().toISOString()
-          : null,
-    })
-    .eq("id", candidato.id);
+const { error } = await supabase
+  .from("candidatos")
+  .update({
+    contratado: nuevoEstado,
+
+    fecha_contratacion:
+      nuevoEstado
+        ? new Date().toISOString()
+        : null,
+  })
+  .eq("id", candidato.id);
+
+if (error) {
+  console.log(error);
+  return;
+}
 
   if (error) {
     console.log(error);
@@ -355,14 +360,7 @@ export default function Home() {
     // CAMBIAR ESTATUS CONTRATADO
     // =========================================
 
-    const nuevoEstado = !candidato.contratado;
-
-    const { error } = await supabase
-      .from("candidatos")
-      .update({
-        contratado: nuevoEstado
-      })
-      .eq("id", candidato.id);
+    
 
     if (error) {
       console.log(error);
