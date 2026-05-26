@@ -194,7 +194,8 @@ export default function Home() {
   const actualizarContratado = async (
     candidato: any
   ) => {
-    const reasignarCandidato = async () => {
+
+  const reasignarCandidato = async () => {
 
       if (!candidatoPendiente || !nuevaVacanteId) {
         alert("Selecciona una vacante");
@@ -221,7 +222,8 @@ export default function Home() {
           vacante: nuevaVacante.nombre,
           vacante_id: nuevaVacante.id,
           cliente: nuevaVacante.cliente,
-          contratado: true
+          contratado: true,
+          fecha_contratacion: new Date()
         })
         .eq("id", candidatoPendiente.id);
 
@@ -441,10 +443,18 @@ export default function Home() {
     const { error } = await supabase
       .from("candidatos")
       .update({
+  contratado: !candidato.contratado,
+
+  fecha_contratacion:
+    !candidato.contratado
+      ? new Date().toISOString()
+      : null,
+})
         vacante: nuevaVacante.nombre,
         vacante_id: nuevaVacante.id,
         cliente: nuevaVacante.cliente,
         contratado: true
+        fecha_contratacion: new Date()
       })
       .eq("id", candidatoPendiente.id);
 
@@ -1438,6 +1448,7 @@ const conversionTernium =
                   <th className="p-4 text-left">Asistencia</th>
                   <th className="p-4 text-left">Contratado</th>
                   <th className="p-4 text-left">Fecha</th>
+                  <th>Fecha Contrato</th>
                   <th className="p-4 text-left">Acciones</th>
                 </tr>
               </thead>
@@ -1473,6 +1484,13 @@ const conversionTernium =
                     <td className="p-4">
                       {new Date(c.created_at).toLocaleDateString("es-MX")}
                     </td>
+                    <td className="p-4">
+  {c.fecha_contratacion
+    ? new Date(
+        c.fecha_contratacion
+      ).toLocaleDateString("es-MX")
+    : "-"}
+</td>
                     <td className="p-4">
                       <button
                         onClick={() => eliminarCandidato(c.id)}
