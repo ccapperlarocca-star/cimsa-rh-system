@@ -194,6 +194,28 @@ export default function Home() {
   const actualizarContratado = async (
     candidato: any
   ) => {
+  
+    const nuevoEstado = !candidato.contratado;
+
+  const { error } = await supabase
+    .from("candidatos")
+    .update({
+      contratado: nuevoEstado,
+
+      fecha_contratacion:
+        nuevoEstado
+          ? new Date().toISOString()
+          : null,
+    })
+    .eq("id", candidato.id);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  obtenerCandidatos();
+  obtenerVacantes();
 
   const reasignarCandidato = async () => {
 
