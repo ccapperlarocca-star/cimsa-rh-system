@@ -1205,9 +1205,17 @@ const totalSemana = {
 
               <h3>Total Vacantes</h3>
 
-              <p className="text-4xl font-bold">
-                {totalVacantes}
-              </p>
+             <p className="text-4xl font-bold">
+
+  {
+    vacantes.reduce(
+      (acc, v) =>
+        acc + (v.solicitados - v.cubiertos),
+      0
+    )
+  }
+
+</p>
 
             </div>
 
