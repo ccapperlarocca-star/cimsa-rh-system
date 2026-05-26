@@ -788,33 +788,130 @@ const conversionTernium =
     : [];
 
   // =====================================================
-  // REPORTE SEMANAL
-  // =====================================================
+// REPORTE SEMANAL
+// =====================================================
 
-  const graficaSemanal = useMemo(() => {
-    const hoy = new Date();
-    hoy.setDate(hoy.getDate() + offsetSemana * 7);
-    const inicioSemana = new Date(hoy);
-    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
-    inicioSemana.setHours(0, 0, 0, 0);
-    const finSemana = new Date(inicioSemana);
-    finSemana.setDate(inicioSemana.getDate() + 6);
-    finSemana.setHours(23, 59, 59, 999);
+const graficaSemanal = useMemo(() => {
 
-    return ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((dia, index) => {
-      const cs = candidatos.filter((c) => {
-        const f = new Date(c.created_at);
-        return f >= inicioSemana && f <= finSemana && f.getDay() === index;
-      });
-      return {
-        dia,
-        acudieron: cs.filter((c) => c.asistencia === "Acudió").length,
-        faltaron: cs.filter((c) => c.asistencia === "Faltó").length,
-        reagendados: cs.filter((c) => c.asistencia === "Reagendado").length,
-        contratados: cs.filter((c) => c.contratado === true).length,
-      };
+  const hoy = new Date();
+
+  hoy.setDate(
+    hoy.getDate() + offsetSemana * 7
+  );
+
+  // =========================================
+  // INICIO SEMANA (MIÉRCOLES)
+  // =========================================
+
+  const inicioSemana = new Date(hoy);
+
+  const diaActual = hoy.getDay();
+
+  const ajuste =
+    diaActual >= 3
+      ? diaActual - 3
+      : diaActual + 4;
+
+  inicioSemana.setDate(
+    hoy.getDate() - ajuste
+  );
+
+  inicioSemana.setHours(0, 0, 0, 0);
+
+  // =========================================
+  // FIN SEMANA (MARTES)
+  // =========================================
+
+  const finSemana = new Date(inicioSemana);
+
+  finSemana.setDate(
+    inicioSemana.getDate() + 6
+  );
+
+  finSemana.setHours(
+    23,
+    59,
+    59,
+    999
+  );
+
+  // =========================================
+  // ORDEN PERSONALIZADO SEMANA RH
+  // =========================================
+
+  const diasSemana = [
+    "Mié",
+    "Jue",
+    "Vie",
+    "Sáb",
+    "Dom",
+    "Lun",
+    "Mar",
+  ];
+
+  // =========================================
+  // MAPEO DÍAS
+  // =========================================
+
+  const mapaSemana: any = {
+    3: 0, // Miércoles
+    4: 1, // Jueves
+    5: 2, // Viernes
+    6: 3, // Sábado
+    0: 4, // Domingo
+    1: 5, // Lunes
+    2: 6, // Martes
+  };
+
+  // =========================================
+  // GENERAR DATOS
+  // =========================================
+
+  return diasSemana.map((dia, index) => {
+
+    const cs = candidatos.filter((c) => {
+
+      const f = new Date(c.created_at);
+
+      return (
+        f >= inicioSemana &&
+        f <= finSemana &&
+        mapaSemana[f.getDay()] === index
+      );
+
     });
-  }, [candidatos, offsetSemana]);
+
+    return {
+      dia,
+
+      acudieron:
+        cs.filter(
+          (c) =>
+            c.asistencia === "Acudió"
+        ).length,
+
+      faltaron:
+        cs.filter(
+          (c) =>
+            c.asistencia === "Faltó"
+        ).length,
+
+      reagendados:
+        cs.filter(
+          (c) =>
+            c.asistencia === "Reagendado"
+        ).length,
+
+      contratados:
+        cs.filter(
+          (c) =>
+            c.contratado === true
+        ).length,
+    };
+
+  });
+
+}, [candidatos, offsetSemana]);
 
   // =====================================================
   // INIT
