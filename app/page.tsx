@@ -787,7 +787,8 @@ const conversionTernium =
     )
     : [];
 
-  // =====================================================
+
+// =====================================================
 // REPORTE SEMANAL
 // =====================================================
 
@@ -800,7 +801,7 @@ const graficaSemanal = useMemo(() => {
   );
 
   // =========================================
-  // INICIO SEMANA (MIÉRCOLES)
+  // INICIO SEMANA RH (MIÉRCOLES)
   // =========================================
 
   const inicioSemana = new Date(hoy);
@@ -816,10 +817,15 @@ const graficaSemanal = useMemo(() => {
     hoy.getDate() - ajuste
   );
 
-  inicioSemana.setHours(0, 0, 0, 0);
+  inicioSemana.setHours(
+    0,
+    0,
+    0,
+    0
+  );
 
   // =========================================
-  // FIN SEMANA (MARTES)
+  // FIN SEMANA RH (MARTES)
   // =========================================
 
   const finSemana = new Date(inicioSemana);
@@ -836,7 +842,7 @@ const graficaSemanal = useMemo(() => {
   );
 
   // =========================================
-  // ORDEN PERSONALIZADO SEMANA RH
+  // ORDEN SEMANA RH
   // =========================================
 
   const diasSemana = [
@@ -854,13 +860,13 @@ const graficaSemanal = useMemo(() => {
   // =========================================
 
   const mapaSemana: any = {
-    3: 0, // Miércoles
-    4: 1, // Jueves
-    5: 2, // Viernes
-    6: 3, // Sábado
-    0: 4, // Domingo
-    1: 5, // Lunes
-    2: 6, // Martes
+    3: 0,
+    4: 1,
+    5: 2,
+    6: 3,
+    0: 4,
+    1: 5,
+    2: 6,
   };
 
   // =========================================
@@ -882,6 +888,7 @@ const graficaSemanal = useMemo(() => {
     });
 
     return {
+
       dia,
 
       acudieron:
@@ -907,11 +914,40 @@ const graficaSemanal = useMemo(() => {
           (c) =>
             c.contratado === true
         ).length,
+
     };
 
   });
 
 }, [candidatos, offsetSemana]);
+
+// =====================================================
+// KPIs SEMANALES
+// =====================================================
+
+const totalSemana = {
+
+  acudieron: graficaSemanal.reduce(
+    (acc, d) => acc + d.acudieron,
+    0
+  ),
+
+  faltaron: graficaSemanal.reduce(
+    (acc, d) => acc + d.faltaron,
+    0
+  ),
+
+  reagendados: graficaSemanal.reduce(
+    (acc, d) => acc + d.reagendados,
+    0
+  ),
+
+  contratados: graficaSemanal.reduce(
+    (acc, d) => acc + d.contratados,
+    0
+  ),
+
+};
 
   // =====================================================
   // INIT
@@ -1511,6 +1547,49 @@ const graficaSemanal = useMemo(() => {
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Reporte Semanal RH</h2>
+            <div className="grid md:grid-cols-4 gap-4 mb-6">
+
+  <div className="bg-green-600 text-white p-4 rounded-xl shadow">
+    <h3 className="text-lg">
+      Acudieron
+    </h3>
+
+    <p className="text-3xl font-bold">
+      {totalSemana.acudieron}
+    </p>
+  </div>
+
+  <div className="bg-red-600 text-white p-4 rounded-xl shadow">
+    <h3 className="text-lg">
+      Faltaron
+    </h3>
+
+    <p className="text-3xl font-bold">
+      {totalSemana.faltaron}
+    </p>
+  </div>
+
+  <div className="bg-yellow-500 text-white p-4 rounded-xl shadow">
+    <h3 className="text-lg">
+      Reagendados
+    </h3>
+
+    <p className="text-3xl font-bold">
+      {totalSemana.reagendados}
+    </p>
+  </div>
+
+  <div className="bg-purple-600 text-white p-4 rounded-xl shadow">
+    <h3 className="text-lg">
+      Contratados
+    </h3>
+
+    <p className="text-3xl font-bold">
+      {totalSemana.contratados}
+    </p>
+  </div>
+
+</div>
             <div className="flex gap-3">
               <button
                 onClick={() => setOffsetSemana(offsetSemana - 1)}
