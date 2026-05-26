@@ -442,20 +442,13 @@ export default function Home() {
 
     const { error } = await supabase
       .from("candidatos")
-      .update({
-  contratado: !candidato.contratado,
-
-  fecha_contratacion:
-    !candidato.contratado
-      ? new Date().toISOString()
-      : null,
+   .update({
+  vacante: nuevaVacante.nombre,
+  vacante_id: nuevaVacante.id,
+  cliente: nuevaVacante.cliente,
+  contratado: true,
+  fecha_contratacion: new Date().toISOString()
 })
-        vacante: nuevaVacante.nombre,
-        vacante_id: nuevaVacante.id,
-        cliente: nuevaVacante.cliente,
-        contratado: true
-        fecha_contratacion: new Date()
-      })
       .eq("id", candidatoPendiente.id);
 
     if (error) {
