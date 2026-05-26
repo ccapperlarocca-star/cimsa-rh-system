@@ -1547,44 +1547,44 @@ const totalSemana = {
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Reporte Semanal RH</h2>
-            <div className="grid md:grid-cols-4 gap-4 mb-6">
+            <div className="flex flex-wrap gap-3 mb-4">
 
-  <div className="bg-green-600 text-white p-4 rounded-xl shadow">
-    <h3 className="text-lg">
+  <div className="bg-green-600 text-white px-4 py-2 rounded-xl shadow min-w-[120px]">
+    <h3 className="text-sm">
       Acudieron
     </h3>
 
-    <p className="text-3xl font-bold">
+    <p className="text-2xl font-bold">
       {totalSemana.acudieron}
     </p>
   </div>
 
-  <div className="bg-red-600 text-white p-4 rounded-xl shadow">
-    <h3 className="text-lg">
+  <div className="bg-red-600 text-white px-4 py-2 rounded-xl shadow min-w-[120px]">
+    <h3 className="text-sm">
       Faltaron
     </h3>
 
-    <p className="text-3xl font-bold">
+    <p className="text-2xl font-bold">
       {totalSemana.faltaron}
     </p>
   </div>
 
-  <div className="bg-yellow-500 text-white p-4 rounded-xl shadow">
-    <h3 className="text-lg">
+  <div className="bg-yellow-500 text-white px-4 py-2 rounded-xl shadow min-w-[120px]">
+    <h3 className="text-sm">
       Reagendados
     </h3>
 
-    <p className="text-3xl font-bold">
+    <p className="text-2xl font-bold">
       {totalSemana.reagendados}
     </p>
   </div>
 
-  <div className="bg-purple-600 text-white p-4 rounded-xl shadow">
-    <h3 className="text-lg">
+  <div className="bg-purple-600 text-white px-4 py-2 rounded-xl shadow min-w-[120px]">
+    <h3 className="text-sm">
       Contratados
     </h3>
 
-    <p className="text-3xl font-bold">
+    <p className="text-2xl font-bold">
       {totalSemana.contratados}
     </p>
   </div>
@@ -1612,7 +1612,6 @@ const totalSemana = {
                 <XAxis dataKey="dia" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
                 <Bar dataKey="acudieron" fill="#16a34a" />
                 <Bar dataKey="faltaron" fill="#dc2626" />
                 <Bar dataKey="reagendados" fill="#eab308" />
