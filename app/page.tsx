@@ -1529,7 +1529,7 @@ const totalSemana = {
 
           <div className="bg-white p-8 rounded-2xl shadow">
             <h2 className="text-2xl font-bold mb-6">Asistencias del Día</h2>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
               {candidatosFecha.length === 0 && <p>No hay candidatos este día</p>}
               {candidatosFecha.map((c) => (
                 <div key={c.id} className="border p-4 rounded-xl">
