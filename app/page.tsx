@@ -962,6 +962,22 @@ const totalSemana = {
 
 };
 
+const totalMes = {
+
+  acudieron: candidatos.filter(
+    (c) => c.asistencia === "Acudió"
+  ).length,
+
+  faltaron: candidatos.filter(
+    (c) => c.asistencia === "Faltó"
+  ).length,
+
+  contratados: candidatos.filter(
+    (c) => c.contratado === true
+  ).length,
+
+};
+
   // =====================================================
   // INIT
   // =====================================================
@@ -1548,7 +1564,39 @@ const totalSemana = {
               value={fechaSeleccionada ?? new Date()}
             />
           </div>
+{/* RESUMEN MENSUAL */}
+  <div className="bg-white p-4 rounded-2xl shadow">
 
+    <h2 className="text-2xl font-bold mb-4">
+      Resumen Mensual
+    </h2>
+
+    <div className="space-y-4">
+
+      <div className="bg-green-600 text-white rounded-xl p-4 flex justify-between items-center">
+        <span>Acudieron</span>
+        <span className="text-2xl font-bold">
+          {totalMes.acudieron}
+        </span>
+      </div>
+
+      <div className="bg-red-600 text-white rounded-xl p-4 flex justify-between items-center">
+        <span>Faltaron</span>
+        <span className="text-2xl font-bold">
+          {totalMes.faltaron}
+        </span>
+      </div>
+
+      <div className="bg-purple-600 text-white rounded-xl p-4 flex justify-between items-center">
+        <span>Contratados</span>
+        <span className="text-2xl font-bold">
+          {totalMes.contratados}
+        </span>
+      </div>
+
+    </div>
+
+  </div>
           <div className="bg-white p-8 rounded-2xl shadow">
             <h2 className="text-2xl font-bold mb-6">Asistencias del Día</h2>
             <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
@@ -1564,103 +1612,7 @@ const totalSemana = {
             </div>
           </div>
         </div>
-         <div className="bg-white p-4 rounded-2xl shadow mt-4">
-          
-{/* RESUMEN MENSUAL */}
-  <h3 className="text-lg font-bold mb-4">
-    Resumen Mensual
-  </h3>
-
-  <div className="space-y-3">
-
-    {/* ACUDIERON */}
-    <div className="bg-green-600 text-white p-3 rounded-xl flex justify-between items-center">
-
-      <span className="text-sm">
-        Acudieron
-      </span>
-
-      <span className="text-2xl font-bold">
-        {
-          candidatos.filter((c) => {
-
-            const f = new Date(c.created_at);
-            const hoy = new Date();
-
-            return (
-              c.asistencia === "Acudió" &&
-              f.getMonth() === hoy.getMonth() &&
-              f.getFullYear() === hoy.getFullYear()
-            );
-
-          }).length
-        }
-      </span>
-
-    </div>
-
-    {/* FALTARON */}
-    <div className="bg-red-600 text-white p-3 rounded-xl flex justify-between items-center">
-
-      <span className="text-sm">
-        Faltaron
-      </span>
-
-      <span className="text-2xl font-bold">
-        {
-          candidatos.filter((c) => {
-
-            const f = new Date(c.created_at);
-            const hoy = new Date();
-
-            return (
-              c.asistencia === "Faltó" &&
-              f.getMonth() === hoy.getMonth() &&
-              f.getFullYear() === hoy.getFullYear()
-            );
-
-          }).length
-        }
-      </span>
-
-    </div>
-
-    {/* CONTRATADOS */}
-    <div className="bg-purple-600 text-white p-3 rounded-xl flex justify-between items-center">
-
-      <span className="text-sm">
-        Contratados
-      </span>
-
-      <span className="text-2xl font-bold">
-        {
-          candidatos.filter((c) => {
-
-            if (!c.fecha_contratacion)
-              return false;
-
-            const f = new Date(
-              c.fecha_contratacion
-            );
-
-            const hoy = new Date();
-
-            return (
-              c.contratado &&
-              f.getMonth() === hoy.getMonth() &&
-              f.getFullYear() === hoy.getFullYear()
-            );
-
-          }).length
-        }
-      </span>
-
-    </div>
-
-  </div>
-
-</div>
-
+   
         {/* REPORTE SEMANAL */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <div className="flex justify-between items-center mb-6">
