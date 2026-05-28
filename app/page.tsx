@@ -909,11 +909,24 @@ const graficaSemanal = useMemo(() => {
             c.asistencia === "Reagendado"
         ).length,
 
-      contratados:
-        cs.filter(
-          (c) =>
-            c.contratado === true
-        ).length,
+      contratados: candidatos.filter((c) => {
+
+  if (
+    !c.contratado ||
+    !c.fecha_contratacion
+  ) return false;
+
+  const fc = new Date(
+    c.fecha_contratacion
+  );
+
+  return (
+    fc >= inicioSemana &&
+    fc <= finSemana &&
+    mapaSemana[fc.getDay()] === index
+  );
+
+}).length,
 
     };
 
