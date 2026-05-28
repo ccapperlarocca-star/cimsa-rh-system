@@ -1539,8 +1539,34 @@ const totalSemana = {
         </div>
 
         {/* CALENDARIO */}
-        <div className="bg-white p-4 rounded-2xl shadow mt-4">
+       
+        <div className="grid md:grid-cols-3 gap-6 items-start">
+          <div className="bg-white p-8 rounded-2xl shadow">
+            <h2 className="text-2xl font-bold mb-6">Calendario de Asistencias</h2>
+            <Calendar
+              onChange={(value) => setFechaSeleccionada(value as Date)}
+              value={fechaSeleccionada ?? new Date()}
+            />
+          </div>
 
+          <div className="bg-white p-8 rounded-2xl shadow">
+            <h2 className="text-2xl font-bold mb-6">Asistencias del Día</h2>
+            <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
+              {candidatosFecha.length === 0 && <p>No hay candidatos este día</p>}
+              {candidatosFecha.map((c) => (
+                <div key={c.id} className="border p-4 rounded-xl">
+                  <p className="font-bold">{c.nombre}</p>
+                  <p>{c.vacante}</p>
+                  <p>{c.asistencia}</p>
+                  <p>{c.contratado ? "Contratado" : "No contratado"}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+         <div className="bg-white p-4 rounded-2xl shadow mt-4">
+          
+{/* RESUMEN MENSUAL */}
   <h3 className="text-lg font-bold mb-4">
     Resumen Mensual
   </h3>
@@ -1634,30 +1660,6 @@ const totalSemana = {
   </div>
 
 </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-8 rounded-2xl shadow">
-            <h2 className="text-2xl font-bold mb-6">Calendario de Asistencias</h2>
-            <Calendar
-              onChange={(value) => setFechaSeleccionada(value as Date)}
-              value={fechaSeleccionada ?? new Date()}
-            />
-          </div>
-
-          <div className="bg-white p-8 rounded-2xl shadow">
-            <h2 className="text-2xl font-bold mb-6">Asistencias del Día</h2>
-            <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
-              {candidatosFecha.length === 0 && <p>No hay candidatos este día</p>}
-              {candidatosFecha.map((c) => (
-                <div key={c.id} className="border p-4 rounded-xl">
-                  <p className="font-bold">{c.nombre}</p>
-                  <p>{c.vacante}</p>
-                  <p>{c.asistencia}</p>
-                  <p>{c.contratado ? "Contratado" : "No contratado"}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
         {/* REPORTE SEMANAL */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
