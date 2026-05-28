@@ -963,19 +963,24 @@ const totalSemana = {
 };
 
 const totalMes = {
-
-  acudieron: candidatos.filter(
-    (c) => c.asistencia === "Acudió"
-  ).length,
-
-  faltaron: candidatos.filter(
-    (c) => c.asistencia === "Faltó"
-  ).length,
-
-  contratados: candidatos.filter(
-    (c) => c.contratado === true
-  ).length,
-
+  acudieron: candidatos.filter((c) => {
+    const fecha = new Date(c.created_at);
+    return c.asistencia === "Acudió" &&
+      fecha.getMonth() === mesActivo.getMonth() &&
+      fecha.getFullYear() === mesActivo.getFullYear();
+  }).length,
+  faltaron: candidatos.filter((c) => {
+    const fecha = new Date(c.created_at);
+    return c.asistencia === "Faltó" &&
+      fecha.getMonth() === mesActivo.getMonth() &&
+      fecha.getFullYear() === mesActivo.getFullYear();
+  }).length,
+  contratados: candidatos.filter((c) => {
+    const fecha = new Date(c.fecha_contratacion || c.created_at);
+    return c.contratado === true &&
+      fecha.getMonth() === mesActivo.getMonth() &&
+      fecha.getFullYear() === mesActivo.getFullYear();
+  }).length,
 };
 
   // =====================================================
@@ -1560,9 +1565,12 @@ const totalMes = {
           <div className="bg-white p-8 rounded-2xl shadow">
             <h2 className="text-2xl font-bold mb-6">Calendario de Asistencias</h2>
             <Calendar
-              onChange={(value) => setFechaSeleccionada(value as Date)}
-              value={fechaSeleccionada ?? new Date()}
-            />
+  onChange={(value) => setFechaSeleccionada(value as Date)}
+  value={fechaSeleccionada ?? new Date()}
+  onActiveStartDateChange={({ activeStartDate }) => {
+    if (activeStartDate) setMesActivo(activeStartDate);
+  }}
+/>
           </div>
 {/* RESUMEN MENSUAL */}
   <div className="bg-white p-4 rounded-2xl shadow">
