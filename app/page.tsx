@@ -97,6 +97,7 @@ export default function Home() {
   // CALENDARIO
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
   const [offsetSemana, setOffsetSemana] = useState(0);
+  const [mesActivo, setMesActivo] = useState(new Date());
 
   useEffect(() => {
     setFechaSeleccionada(new Date());
