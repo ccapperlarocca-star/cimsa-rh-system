@@ -117,15 +117,20 @@ export default function Home() {
     setCandidatos(data || []);
   };
 
-  const obtenerVacantes = async () => {
-    const { data, error } = await supabase
-      .from("vacantes")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) { console.log(error); return; }
-    setVacantes(data || []);
-  };
+ const obtenerVacantes = async () => {
+  const { data, error } = await supabase
+    .from("vacantes")
+    .select("*")
+    .eq("eliminada", false)
+    .order("created_at", { ascending: false });
 
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  setVacantes(data || []);
+};
   // =====================================================
   // GUARDAR CANDIDATO
   // =====================================================
@@ -557,11 +562,23 @@ if (error) {
   };
 
   const eliminarVacante = async (id: string) => {
-    if (!confirm("¿Eliminar vacante?")) return;
-    const { error } = await supabase.from("vacantes").delete().eq("id", id);
-    if (error) { console.log(error); alert(error.message); return; }
-    obtenerVacantes();
-  };
+  if (!confirm("¿Archivar esta vacante?")) return;
+
+  const { error } = await supabase
+    .from("vacantes")
+    .update({
+      eliminada: true
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.log(error);
+    alert(error.message);
+    return;
+  }
+
+  obtenerVacantes();
+};
 
   // =====================================================
   // KPIs
