@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -45,13 +46,15 @@ const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
   { vacante: "AUXILIAR DE CALIDAD", cliente: "ALEXANDRA VILLARREAL" },
 ];
 
-export default function Home() {
+function Home() {
 
   // =====================================================
   // FECHA Y HORA ACTUAL
   // =====================================================
 
-  const [fechaActual, setFechaActual] = useState(new Date());
+  const [fechaActual, setFechaActual] = useState<Date | null>(null);
+  const [relojActivo, setRelojActivo] = useState(false);
+  const [componenteMontado, setComponenteMontado] = useState(false);
 
   // STATES CANDIDATOS
   const [nombre, setNombre] = useState("");
@@ -62,6 +65,8 @@ export default function Home() {
   const [localidad, setLocalidad] = useState("");
   const [medioCaptacion, setMedioCaptacion] = useState("");
   const [candidatos, setCandidatos] = useState<any[]>([]);
+
+  const [busqueda, setBusqueda] = useState("");
 
   // =====================================================
   // PAGINACIÓN CANDIDATOS
@@ -98,10 +103,15 @@ export default function Home() {
   // CALENDARIO
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null);
   const [offsetSemana, setOffsetSemana] = useState(0);
-  const [mesActivo, setMesActivo] = useState(new Date());
+  const [mesActivo, setMesActivo] = useState<Date | null>(null);
 
   useEffect(() => {
-    setFechaSeleccionada(new Date());
+    const ahora = new Date();
+    setFechaSeleccionada(ahora);
+    setMesActivo(ahora);
+    setFechaActual(ahora);
+    setRelojActivo(true);
+    setComponenteMontado(true);
   }, []);
 
   // =====================================================
@@ -437,12 +447,54 @@ if (error) {
 
   const actualizarEstatusVacante = async (id: string, nuevoEstatus: string) => {
     if (!id) return;
+
+    // Obtener la vacante actual para calcular correctamente el tiempo
+    // cuando el estatus se cambia manualmente.
+    const { data: vacanteData, error: vacanteError } = await supabase
+      .from("vacantes")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (vacanteError || !vacanteData) {
+      console.log("Error obteniendo vacante:", vacanteError);
+      return;
+    }
+
+    let fechaCobertura = null;
+    let diasCobertura = null;
+
+    if (nuevoEstatus === "Cubierta") {
+      fechaCobertura = new Date();
+
+      const fechaInicio = new Date(vacanteData.created_at);
+
+      const diferenciaMs =
+        fechaCobertura.getTime() - fechaInicio.getTime();
+
+      diasCobertura = Math.max(
+        0,
+        Math.ceil(
+          diferenciaMs / (1000 * 60 * 60 * 24)
+        )
+      );
+    }
+
     const { data, error } = await supabase
-      .from("vacantes").update({ estatus: nuevoEstatus }).eq("id", id).select();
+      .from("vacantes")
+      .update({
+        estatus: nuevoEstatus,
+        fecha_cobertura: fechaCobertura,
+        dias_cobertura: diasCobertura
+      })
+      .eq("id", id)
+      .select();
+
     if (error || !data || data.length === 0) {
       console.log("Error actualizando estatus:", error);
       return;
     }
+
     obtenerVacantes();
   };
 
@@ -698,6 +750,71 @@ const conversionTernium =
     ).length;
 
   // =====================================================
+  // TIEMPO PROMEDIO DE COBERTURA
+  // =====================================================
+
+  // Solo se consideran vacantes ya cubiertas y con un
+  // dias_cobertura válido.
+  const vacantesConTiempoCobertura = vacantes.filter(
+    (v) =>
+      v.estatus === "Cubierta" &&
+      v.dias_cobertura !== null &&
+      v.dias_cobertura !== undefined &&
+      Number.isFinite(Number(v.dias_cobertura))
+  );
+
+  const calcularPromedioDias = (lista: any[]) => {
+    if (lista.length === 0) return null;
+
+    const suma = lista.reduce(
+      (acc, v) => acc + Number(v.dias_cobertura),
+      0
+    );
+
+    return suma / lista.length;
+  };
+
+  const promedioDiasCobertura = calcularPromedioDias(
+    vacantesConTiempoCobertura
+  );
+
+  const promedioDiasCoberturaCimsa = calcularPromedioDias(
+    vacantesConTiempoCobertura.filter(
+      (v) => v.cliente !== "HUGO CASADOS"
+    )
+  );
+
+  const promedioDiasCoberturaTernium = calcularPromedioDias(
+    vacantesConTiempoCobertura.filter(
+      (v) => v.cliente === "HUGO CASADOS"
+    )
+  );
+
+  // Promedio por cada tipo de vacante.
+  const promedioPorVacante = Object.values(
+    vacantesConTiempoCobertura.reduce((acc: any, v: any) => {
+      if (!acc[v.nombre]) {
+        acc[v.nombre] = {
+          nombre: v.nombre,
+          cliente: v.cliente,
+          cubiertas: 0,
+          sumaDias: 0,
+          promedio: 0,
+        };
+      }
+
+      acc[v.nombre].cubiertas += 1;
+      acc[v.nombre].sumaDias += Number(v.dias_cobertura);
+      acc[v.nombre].promedio =
+        acc[v.nombre].sumaDias / acc[v.nombre].cubiertas;
+
+      return acc;
+    }, {})
+  ).sort((a: any, b: any) =>
+    a.nombre.localeCompare(b.nombre, "es")
+  );
+
+  // =====================================================
   // TOTAL
   // =====================================================
 
@@ -790,15 +907,30 @@ const conversionTernium =
   const indiceFinalCandidatos =
     indiceInicialCandidatos + candidatosPorPagina;
 
-  const candidatosPaginados =
-    candidatos.slice(
-      indiceInicialCandidatos,
-      indiceFinalCandidatos
-    );
+  const candidatosFiltrados = candidatos.filter((c: any) => {
+  const texto = busqueda.toLowerCase().trim();
+
+  return (
+    (c.nombre ?? "").toLowerCase().includes(texto) ||
+    (c.telefono ?? "").toLowerCase().includes(texto) ||
+    (c.vacante ?? "").toLowerCase().includes(texto) ||
+    (c.cliente ?? "").toLowerCase().includes(texto) ||
+    (c.localidad ?? "").toLowerCase().includes(texto) ||
+    (c.medio_captacion ?? "").toLowerCase().includes(texto) ||
+    (c.asistencia ?? "").toLowerCase().includes(texto) ||
+    String(c.contratado ?? "").toLowerCase().includes(texto)
+  );
+});
+
+ const candidatosPaginados =
+  candidatosFiltrados.slice(
+    indiceInicialCandidatos,
+    indiceFinalCandidatos
+  );
 
   const totalPaginasCandidatos = Math.ceil(
-    candidatos.length / candidatosPorPagina
-  );
+  candidatosFiltrados.length / candidatosPorPagina
+);
 
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
@@ -985,20 +1117,20 @@ const totalMes = {
   acudieron: candidatos.filter((c) => {
     const fecha = new Date(c.created_at);
     return c.asistencia === "Acudió" &&
-      fecha.getMonth() === mesActivo.getMonth() &&
-      fecha.getFullYear() === mesActivo.getFullYear();
+      mesActivo !== null && fecha.getMonth() === mesActivo.getMonth() &&
+      mesActivo !== null && fecha.getFullYear() === mesActivo.getFullYear();
   }).length,
   faltaron: candidatos.filter((c) => {
     const fecha = new Date(c.created_at);
     return c.asistencia === "Faltó" &&
-      fecha.getMonth() === mesActivo.getMonth() &&
-      fecha.getFullYear() === mesActivo.getFullYear();
+      mesActivo !== null && fecha.getMonth() === mesActivo.getMonth() &&
+      mesActivo !== null && fecha.getFullYear() === mesActivo.getFullYear();
   }).length,
   contratados: candidatos.filter((c) => {
     const fecha = new Date(c.fecha_contratacion || c.created_at);
     return c.contratado === true &&
-      fecha.getMonth() === mesActivo.getMonth() &&
-      fecha.getFullYear() === mesActivo.getFullYear();
+      mesActivo !== null && fecha.getMonth() === mesActivo.getMonth() &&
+      mesActivo !== null && fecha.getFullYear() === mesActivo.getFullYear();
   }).length,
 };
 
@@ -1072,20 +1204,24 @@ const totalMes = {
               </p>
 
               <h2 className="text-2xl font-bold text-blue-900">
-                {fechaActual.toLocaleDateString("es-MX", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {componenteMontado && fechaActual
+                  ? fechaActual.toLocaleDateString("es-MX", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "--"}
               </h2>
 
               <p className="text-gray-600 text-lg mt-1">
-                {fechaActual.toLocaleTimeString("es-MX", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
+                {componenteMontado && fechaActual
+                  ? fechaActual.toLocaleTimeString("es-MX", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })
+                  : "--:--:--"}
               </p>
 
             </div>
@@ -1272,6 +1408,132 @@ const totalMes = {
 
             </div>
 
+          </div>
+
+          {/* ===================================================== */}
+          {/* KPIs TIEMPO DE COBERTURA */}
+          {/* ===================================================== */}
+
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold mb-4">
+              Tiempo Promedio de Cobertura
+            </h3>
+
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
+
+              {/* PROMEDIO GENERAL */}
+              <div className="bg-indigo-700 text-white p-6 rounded-xl shadow">
+                <h3 className="text-sm uppercase tracking-wide">
+                  Promedio General
+                </h3>
+                <p className="text-4xl font-bold mt-2">
+                  {promedioDiasCobertura !== null
+                    ? `${promedioDiasCobertura.toFixed(1)} días`
+                    : "Sin datos"}
+                </p>
+                <p className="text-sm mt-2 opacity-90">
+                  Vacantes cubiertas: {vacantesConTiempoCobertura.length}
+                </p>
+              </div>
+
+              {/* PROMEDIO CIMSA */}
+              <div className="bg-blue-800 text-white p-6 rounded-xl shadow">
+                <h3 className="text-sm uppercase tracking-wide">
+                  Promedio CIMSA
+                </h3>
+                <p className="text-4xl font-bold mt-2">
+                  {promedioDiasCoberturaCimsa !== null
+                    ? `${promedioDiasCoberturaCimsa.toFixed(1)} días`
+                    : "Sin datos"}
+                </p>
+                <p className="text-sm mt-2 opacity-90">
+                  Vacantes cubiertas:{" "}
+                  {
+                    vacantesConTiempoCobertura.filter(
+                      (v) => v.cliente !== "HUGO CASADOS"
+                    ).length
+                  }
+                </p>
+              </div>
+
+              {/* PROMEDIO TERNIUM */}
+              <div className="bg-purple-700 text-white p-6 rounded-xl shadow">
+                <h3 className="text-sm uppercase tracking-wide">
+                  Promedio Ternium
+                </h3>
+                <p className="text-4xl font-bold mt-2">
+                  {promedioDiasCoberturaTernium !== null
+                    ? `${promedioDiasCoberturaTernium.toFixed(1)} días`
+                    : "Sin datos"}
+                </p>
+                <p className="text-sm mt-2 opacity-90">
+                  Vacantes cubiertas:{" "}
+                  {
+                    vacantesConTiempoCobertura.filter(
+                      (v) => v.cliente === "HUGO CASADOS"
+                    ).length
+                  }
+                </p>
+              </div>
+
+            </div>
+
+            {/* PROMEDIO POR CADA VACANTE */}
+            <div className="border rounded-2xl overflow-hidden">
+              <div className="bg-gray-100 px-5 py-4">
+                <h4 className="text-xl font-bold text-blue-900">
+                  Promedio de días por vacante
+                </h4>
+                <p className="text-sm text-gray-600 mt-1">
+                  Solo se consideran requerimientos que ya fueron cubiertos.
+                </p>
+              </div>
+
+              {promedioPorVacante.length === 0 ? (
+                <div className="p-6 text-gray-500">
+                  Aún no hay vacantes cubiertas con datos de tiempo.
+                </div>
+              ) : (
+                <div className="max-h-[300px] overflow-y-auto">
+                  <table className="w-full">
+                    <thead className="sticky top-0 z-10 bg-gray-50">
+                      <tr className="border-t border-b">
+                        <th className="p-4 text-left">Vacante</th>
+                        <th className="p-4 text-left">Cliente</th>
+                        <th className="p-4 text-left">
+                          Requerimientos cubiertos
+                        </th>
+                        <th className="p-4 text-left">
+                          Promedio de cobertura
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {promedioPorVacante.map((r: any) => (
+                        <tr key={`${r.nombre}-${r.cliente}`} className="border-b">
+                          <td className="p-4 font-semibold">
+                            {r.nombre}
+                          </td>
+
+                          <td className="p-4">
+                            {r.cliente}
+                          </td>
+
+                          <td className="p-4">
+                            {r.cubiertas}
+                          </td>
+
+                          <td className="p-4 font-bold text-indigo-700">
+                            {r.promedio.toFixed(1)} días
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* FORM NUEVA VACANTE — usa catálogo, auto-llena cliente */}
@@ -1584,12 +1846,18 @@ const totalMes = {
           <div className="bg-white p-8 rounded-2xl shadow">
             <h2 className="text-2xl font-bold mb-6">Calendario de Asistencias</h2>
             <Calendar
-  onChange={(value) => setFechaSeleccionada(value as Date)}
-  value={fechaSeleccionada ?? new Date()}
-  onActiveStartDateChange={({ activeStartDate }) => {
-    if (activeStartDate) setMesActivo(activeStartDate);
-  }}
-/>
+              onChange={(value) => {
+                if (value instanceof Date) {
+                  setFechaSeleccionada(value);
+                }
+              }}
+              value={fechaSeleccionada ?? new Date()}
+              onActiveStartDateChange={({ activeStartDate }) => {
+                if (activeStartDate) {
+                  setMesActivo(activeStartDate);
+                }
+              }}
+            />
           </div>
 {/* RESUMEN MENSUAL */}
   <div className="bg-white p-4 rounded-2xl shadow">
@@ -1702,8 +1970,9 @@ const totalMes = {
               >Semana siguiente →</button>
             </div>
           </div>
-          <div style={{ width: "100%", height: 400, minHeight: 400 }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <div style={{ width: "100%", height: 400, minHeight: 400, minWidth: 1 }}>
+            {componenteMontado && (
+              <ResponsiveContainer width="100%" height={400} minWidth={1} minHeight={400}>
               <BarChart data={graficaSemanal}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="dia" />
@@ -1714,13 +1983,23 @@ const totalMes = {
                 <Bar dataKey="reagendados" fill="#eab308" />
                 <Bar dataKey="contratados" fill="#9333ea" />
               </BarChart>
-            </ResponsiveContainer>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
         {/* TABLA CANDIDATOS */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
           <h2 className="text-3xl font-bold mb-6">Candidatos Registrados</h2>
+          <div className="mb-4">
+  <input
+    type="text"
+    placeholder="🔍 Buscar por nombre, teléfono, vacante, cliente..."
+    value={busqueda}
+    onChange={(e) => setBusqueda(e.target.value)}
+    className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+</div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -1894,3 +2173,5 @@ const totalMes = {
     </main>
   );
 }
+
+export default dynamic(() => Promise.resolve(Home), { ssr: false });
