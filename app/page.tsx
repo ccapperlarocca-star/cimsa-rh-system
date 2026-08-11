@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
-
+import { LogOut } from "lucide-react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
@@ -47,7 +47,18 @@ const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
 ];
 
 function Home() {
-
+const cerrarSesion = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Error cerrando sesión:", error);
+    } finally {
+      window.location.href =
+        "https://cimsa-admin-portal.vercel.app/";
+    }
+  };
   // =====================================================
   // FECHA Y HORA ACTUAL
   // =====================================================
@@ -208,141 +219,9 @@ function Home() {
   // CONTRATADO + HEADCOUNT (por vacante_id)
   // =====================================================
 
- const actualizarContratado = async (
-  candidato: any
-) => {
-
-  const nuevoEstado = !candidato.contratado;
-
-const { error } = await supabase
-  .from("candidatos")
-  .update({
-    contratado: nuevoEstado,
-
-    fecha_contratacion:
-      nuevoEstado
-        ? new Date().toISOString()
-        : null,
-  })
-  .eq("id", candidato.id);
-
-if (error) {
-  console.log(error);
-  return;
-}
-
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  obtenerCandidatos();
-  obtenerVacantes();
-
-  const reasignarCandidato = async () => {
-
-      if (!candidatoPendiente || !nuevaVacanteId) {
-        alert("Selecciona una vacante");
-        return;
-      }
-
-      // =========================================
-      // OBTENER NUEVA VACANTE
-      // =========================================
-
-      const nuevaVacante = vacantes.find(
-        (v) => v.id === nuevaVacanteId
-      );
-
-      if (!nuevaVacante) return;
-
-      // =========================================
-      // ACTUALIZAR CANDIDATO
-      // =========================================
-
-      const { error } = await supabase
-        .from("candidatos")
-        .update({
-          vacante: nuevaVacante.nombre,
-          vacante_id: nuevaVacante.id,
-          cliente: nuevaVacante.cliente,
-          contratado: true,
-          fecha_contratacion: new Date()
-        })
-        .eq("id", candidatoPendiente.id);
-
-      if (error) {
-        console.log(error);
-        return;
-      }
-
-      // =========================================
-      // RECALCULAR NUEVA VACANTE
-      // =========================================
-
-      const { data: contratadosData } = await supabase
-        .from("candidatos")
-        .select("id")
-        .eq("vacante_id", nuevaVacante.id)
-        .eq("contratado", true);
-
-      const cubiertosReales = contratadosData?.length || 0;
-
-      const nuevoEstatus =
-        cubiertosReales >= nuevaVacante.solicitados
-          ? "Cubierta"
-          : "Abierta";
-      let fechaCobertura = null;
-      let diasCobertura = null;
-
-      if (nuevoEstatus === "Cubierta") {
-
-        fechaCobertura = new Date();
-
-        const fechaInicio = new Date(vacanteData.created_at);
-
-        const diferenciaMs =
-          fechaCobertura.getTime() - fechaInicio.getTime();
-
-        diasCobertura = Math.ceil(
-          diferenciaMs / (1000 * 60 * 60 * 24)
-        );
-      }
-
-      // =========================================
-      // ACTUALIZAR VACANTE
-      // =========================================
-
-      await supabase
-        .from("vacantes")
-        .update({
-          cubiertos: cubiertosReales,
-          estatus: nuevoEstatus,
-          fecha_cobertura: fechaCobertura,
-          dias_cobertura: diasCobertura
-        })
-        .eq("id", nuevaVacante.id);
-
-      // =========================================
-      // LIMPIAR
-      // =========================================
-
-      setMostrarReasignacion(false);
-
-      setCandidatoPendiente(null);
-
-      setNuevaVacanteId("");
-
-      obtenerVacantes();
-
-      obtenerCandidatos();
-    };
-
+  const actualizarContratado = async (candidato: any) => {
+    const nuevoEstado = !candidato.contratado;
     const vId = candidato.vacante_id;
-
-    // =========================================
-    // OBTENER VACANTE
-    // =========================================
 
     const { data: vacanteData, error: vacanteError } = await supabase
       .from("vacantes")
@@ -351,94 +230,188 @@ if (error) {
       .single();
 
     if (vacanteError || !vacanteData) {
-      console.log(vacanteError);
+      console.log("Error obteniendo vacante:", vacanteError);
       return;
     }
 
-    // =========================================
-    // VALIDAR SI YA ESTÁ CUBIERTA
-    // =========================================
-
+    // Si se intenta contratar y la vacante ya alcanzó el número solicitado,
+    // obligamos a reasignar al candidato a otro requerimiento disponible.
     if (
-      vacanteData.cubiertos >= vacanteData.solicitados &&
-      !candidato.contratado
+      nuevoEstado &&
+      vacanteData.cubiertos >= vacanteData.solicitados
     ) {
-
       alert("La vacante ya fue cubierta. Debes reasignar el candidato.");
-
       setCandidatoPendiente(candidato);
-
       setMostrarReasignacion(true);
-
       return;
     }
 
-    // =========================================
-    // CAMBIAR ESTATUS CONTRATADO
-    // =========================================
-
-    
+    const { error } = await supabase
+      .from("candidatos")
+      .update({
+        contratado: nuevoEstado,
+        fecha_contratacion: nuevoEstado
+          ? new Date().toISOString()
+          : null,
+      })
+      .eq("id", candidato.id);
 
     if (error) {
-      console.log(error);
+      console.log("Error actualizando candidato:", error);
+      alert(error.message);
       return;
     }
 
-    // =========================================
-    // RECALCULAR CUBIERTOS
-    // =========================================
-
-    const { data: contratadosData } = await supabase
+    // Recalcular el headcount real de la vacante.
+    const { data: contratadosData, error: contratadosError } = await supabase
       .from("candidatos")
       .select("id")
       .eq("vacante_id", vId)
       .eq("contratado", true);
 
+    if (contratadosError) {
+      console.log("Error recalculando cubiertos:", contratadosError);
+      return;
+    }
+
     const cubiertosReales = contratadosData?.length || 0;
-
-    // =========================================
-    // NUEVO ESTATUS
-    // =========================================
-
     const nuevoEstatus =
       cubiertosReales >= vacanteData.solicitados
         ? "Cubierta"
         : "Abierta";
-    let fechaCobertura = null;
-    let diasCobertura = null;
 
-    if (nuevoEstatus === "Cubierta") {
+    let fechaCobertura: string | null = vacanteData.fecha_cobertura ?? null;
+    let diasCobertura: number | null = vacanteData.dias_cobertura ?? null;
 
-      fechaCobertura = new Date();
+    if (nuevoEstatus === "Cubierta" && vacanteData.estatus !== "Cubierta") {
+      const fechaCoberturaDate = new Date();
+      fechaCobertura = fechaCoberturaDate.toISOString();
 
       const fechaInicio = new Date(vacanteData.created_at);
-
       const diferenciaMs =
-        fechaCobertura.getTime() - fechaInicio.getTime();
+        fechaCoberturaDate.getTime() - fechaInicio.getTime();
 
-      diasCobertura = Math.ceil(
-        diferenciaMs / (1000 * 60 * 60 * 24)
+      diasCobertura = Math.max(
+        0,
+        Math.ceil(diferenciaMs / (1000 * 60 * 60 * 24))
       );
+    } else if (nuevoEstatus === "Abierta") {
+      fechaCobertura = null;
+      diasCobertura = null;
     }
 
-    // =========================================
-    // ACTUALIZAR VACANTE
-    // =========================================
-
-    await supabase
+    const { error: vacanteUpdateError } = await supabase
       .from("vacantes")
       .update({
         cubiertos: cubiertosReales,
         estatus: nuevoEstatus,
         fecha_cobertura: fechaCobertura,
-        dias_cobertura: diasCobertura
+        dias_cobertura: diasCobertura,
       })
-
       .eq("id", vId);
 
-    obtenerVacantes();
+    if (vacanteUpdateError) {
+      console.log("Error actualizando vacante:", vacanteUpdateError);
+      alert(vacanteUpdateError.message);
+      return;
+    }
 
-    obtenerCandidatos();
+    await Promise.all([obtenerCandidatos(), obtenerVacantes()]);
+  };
+
+  // =====================================================
+  // REASIGNAR CANDIDATO
+  // =====================================================
+
+  const reasignarCandidato = async () => {
+    if (!candidatoPendiente || !nuevaVacanteId) {
+      alert("Selecciona una vacante");
+      return;
+    }
+
+    const nuevaVacante = vacantes.find((v) => v.id === nuevaVacanteId);
+
+    if (!nuevaVacante) {
+      alert("No se encontró la vacante seleccionada");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("candidatos")
+      .update({
+        vacante: nuevaVacante.nombre,
+        vacante_id: nuevaVacante.id,
+        cliente: nuevaVacante.cliente,
+        contratado: true,
+        fecha_contratacion: new Date().toISOString(),
+      })
+      .eq("id", candidatoPendiente.id);
+
+    if (error) {
+      console.log("Error reasignando candidato:", error);
+      alert(error.message);
+      return;
+    }
+
+    // Recalcular el headcount de la nueva vacante.
+    const { data: contratadosData, error: contratadosError } = await supabase
+      .from("candidatos")
+      .select("id")
+      .eq("vacante_id", nuevaVacante.id)
+      .eq("contratado", true);
+
+    if (contratadosError) {
+      console.log("Error recalculando la nueva vacante:", contratadosError);
+      return;
+    }
+
+    const cubiertosReales = contratadosData?.length || 0;
+    const nuevoEstatus =
+      cubiertosReales >= nuevaVacante.solicitados
+        ? "Cubierta"
+        : "Abierta";
+
+    let fechaCobertura: string | null = nuevaVacante.fecha_cobertura ?? null;
+    let diasCobertura: number | null = nuevaVacante.dias_cobertura ?? null;
+
+    if (nuevoEstatus === "Cubierta" && nuevaVacante.estatus !== "Cubierta") {
+      const fechaCoberturaDate = new Date();
+      fechaCobertura = fechaCoberturaDate.toISOString();
+
+      const fechaInicio = new Date(nuevaVacante.created_at);
+      const diferenciaMs =
+        fechaCoberturaDate.getTime() - fechaInicio.getTime();
+
+      diasCobertura = Math.max(
+        0,
+        Math.ceil(diferenciaMs / (1000 * 60 * 60 * 24))
+      );
+    } else if (nuevoEstatus === "Abierta") {
+      fechaCobertura = null;
+      diasCobertura = null;
+    }
+
+    const { error: vacanteUpdateError } = await supabase
+      .from("vacantes")
+      .update({
+        cubiertos: cubiertosReales,
+        estatus: nuevoEstatus,
+        fecha_cobertura: fechaCobertura,
+        dias_cobertura: diasCobertura,
+      })
+      .eq("id", nuevaVacante.id);
+
+    if (vacanteUpdateError) {
+      console.log("Error actualizando nueva vacante:", vacanteUpdateError);
+      alert(vacanteUpdateError.message);
+      return;
+    }
+
+    setMostrarReasignacion(false);
+    setCandidatoPendiente(null);
+    setNuevaVacanteId("");
+
+    await Promise.all([obtenerVacantes(), obtenerCandidatos()]);
   };
 
   // =====================================================
@@ -496,110 +469,6 @@ if (error) {
     }
 
     obtenerVacantes();
-  };
-
-  const reasignarCandidato = async () => {
-
-    if (!candidatoPendiente || !nuevaVacanteId) {
-      alert("Selecciona una vacante");
-      return;
-    }
-
-    // =========================================
-    // OBTENER NUEVA VACANTE
-    // =========================================
-
-    const nuevaVacante = vacantes.find(
-      (v) => v.id === nuevaVacanteId
-    );
-
-    if (!nuevaVacante) return;
-
-    // =========================================
-    // ACTUALIZAR CANDIDATO
-    // =========================================
-
-    const { error } = await supabase
-      .from("candidatos")
-   .update({
-  vacante: nuevaVacante.nombre,
-  vacante_id: nuevaVacante.id,
-  cliente: nuevaVacante.cliente,
-  contratado: true,
-  fecha_contratacion: new Date().toISOString()
-})
-      .eq("id", candidatoPendiente.id);
-
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    // =========================================
-    // RECALCULAR CUBIERTOS
-    // =========================================
-
-    const { data: contratadosData } = await supabase
-      .from("candidatos")
-      .select("id")
-      .eq("vacante_id", nuevaVacante.id)
-      .eq("contratado", true);
-
-    const cubiertosReales = contratadosData?.length || 0;
-
-    // =========================================
-    // NUEVO ESTATUS
-    // =========================================
-
-    const nuevoEstatus =
-      cubiertosReales >= nuevaVacante.solicitados
-        ? "Cubierta"
-        : "Abierta";
-    let fechaCobertura = null;
-    let diasCobertura = null;
-
-    if (nuevoEstatus === "Cubierta") {
-
-      fechaCobertura = new Date();
-
-      const fechaInicio = new Date(nuevaVacante.created_at);
-
-      const diferenciaMs =
-        fechaCobertura.getTime() - fechaInicio.getTime();
-
-      diasCobertura = Math.ceil(
-        diferenciaMs / (1000 * 60 * 60 * 24)
-      );
-    }
-
-    // =========================================
-    // ACTUALIZAR VACANTE
-    // =========================================
-
-    await supabase
-      .from("vacantes")
-      .update({
-        cubiertos: cubiertosReales,
-        estatus: nuevoEstatus,
-        fecha_cobertura: fechaCobertura,
-        dias_cobertura: diasCobertura
-      })
-
-      .eq("id", nuevaVacante.id);
-
-    // =========================================
-    // LIMPIAR MODAL
-    // =========================================
-
-    setMostrarReasignacion(false);
-
-    setCandidatoPendiente(null);
-
-    setNuevaVacanteId("");
-
-    obtenerVacantes();
-
-    obtenerCandidatos();
   };
 
   // =====================================================
@@ -833,8 +702,9 @@ const conversionTernium =
   const vacantesPaginadas =
     vacantes.slice(indiceInicial, indiceFinal);
 
-  const totalPaginas = Math.ceil(
-    vacantes.length / vacantesPorPagina
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(vacantes.length / vacantesPorPagina)
   );
 
   // =====================================================
@@ -893,8 +763,9 @@ const conversionTernium =
       indiceFinalResumen
     );
 
-  const totalPaginasResumen = Math.ceil(
-    resumenVacantes.length / resumenPorPagina
+  const totalPaginasResumen = Math.max(
+    1,
+    Math.ceil(resumenVacantes.length / resumenPorPagina)
   );
 
   // =====================================================
@@ -928,9 +799,10 @@ const conversionTernium =
     indiceFinalCandidatos
   );
 
-  const totalPaginasCandidatos = Math.ceil(
-  candidatosFiltrados.length / candidatosPorPagina
-);
+  const totalPaginasCandidatos = Math.max(
+    1,
+    Math.ceil(candidatosFiltrados.length / candidatosPorPagina)
+  );
 
   const candidatosFecha = fechaSeleccionada
     ? candidatos.filter((c) =>
@@ -1177,17 +1049,17 @@ const totalMes = {
   // =====================================================
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
 
         {/* HEADER */}
         <div className="bg-white p-8 rounded-2xl shadow mb-8">
 
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
             {/* IZQUIERDA */}
-            <div>
-              <h1 className="text-5xl font-bold text-blue-900 mb-2">
+            <div className="min-w-0">
+              <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-2">
                 CIMSA RH SYSTEM
               </h1>
 
@@ -1196,42 +1068,52 @@ const totalMes = {
               </p>
             </div>
 
-            {/* DERECHA */}
-            <div className="text-right">
+           {/* DERECHA */}
+<div className="flex flex-col items-end gap-3">
 
-              <p className="text-gray-500 text-sm uppercase tracking-wide">
-                Fecha Actual
-              </p>
+  <div className="text-right">
 
-              <h2 className="text-2xl font-bold text-blue-900">
-                {componenteMontado && fechaActual
-                  ? fechaActual.toLocaleDateString("es-MX", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "--"}
-              </h2>
+    <p className="text-gray-500 text-sm uppercase tracking-wide">
+      Fecha Actual
+    </p>
 
-              <p className="text-gray-600 text-lg mt-1">
-                {componenteMontado && fechaActual
-                  ? fechaActual.toLocaleTimeString("es-MX", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })
-                  : "--:--:--"}
-              </p>
+    <h2 className="text-xl md:text-2xl font-bold text-blue-900 capitalize">
+      {componenteMontado && fechaActual
+        ? fechaActual.toLocaleDateString("es-MX", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "--"}
+    </h2>
 
-            </div>
+    <p className="text-gray-600 text-lg mt-1">
+      {componenteMontado && fechaActual
+        ? fechaActual.toLocaleTimeString("es-MX", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })
+        : "--:--:--"}
+    </p>
+
+  </div>
+
+  <button
+    onClick={cerrarSesion}
+    className="flex items-center justify-center gap-2 bg-red-600 text-white px-5 py-3 rounded-xl font-semibold hover:bg-red-700 transition w-full sm:w-auto"
+  >
+    <LogOut size={18} />
+    Cerrar sesión
+  </button>
+
+</div>
 
           </div>
-
         </div>
 
-       
-{/* KPIs RH CIMSA */}
+        {/* KPIs RH CIMSA */}
 {/* ===================================================== */}
 
 <h2 className="text-2xl font-bold mb-4">
@@ -1996,7 +1878,10 @@ const totalMes = {
     type="text"
     placeholder="🔍 Buscar por nombre, teléfono, vacante, cliente..."
     value={busqueda}
-    onChange={(e) => setBusqueda(e.target.value)}
+    onChange={(e) => {
+      setBusqueda(e.target.value);
+      setPaginaCandidatos(1);
+    }}
     className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
 </div>
@@ -2169,7 +2054,8 @@ const totalMes = {
 
           </div>
         )}
-              </div>
+
+          </div>
     </main>
   );
 }
