@@ -85,8 +85,9 @@ export async function POST(request: Request) {
     // REDIRECCIONAR AL SISTEMA
     // =========================================
     return NextResponse.redirect(
-      new URL("/", request.url)
-    );
+  new URL("/dashboard", request.url),
+  303
+);
 
   } catch (error) {
     console.error("SSO ERROR:", error);
