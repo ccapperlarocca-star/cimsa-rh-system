@@ -44,6 +44,7 @@ const CATALOGO_VACANTES: { vacante: string; cliente: string }[] = [
   { vacante: "INSPECTOR", cliente: "HUGO CASADOS" },
   { vacante: "SEGURIDAD TERNIUM", cliente: "HUGO CASADOS" },
   { vacante: "AUXILIAR DE CALIDAD", cliente: "ALEXANDRA VILLARREAL" },
+  { vacante: "TORNERO", cliente: "ISRAEL FLORES" },
 ];
 
 function Home() {
